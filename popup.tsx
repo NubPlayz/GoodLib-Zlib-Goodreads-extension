@@ -133,6 +133,26 @@ function IndexPopup() {
           </label>
         </div>
       </div>
+
+      <div className="popup-footer">
+        <a
+          className="popup-action-btn"
+          href="https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension"
+          target="_blank"
+          rel="noreferrer">
+          <span className="popup-action-star" aria-hidden="true">
+            ★
+          </span>
+          <span>GitHub</span>
+        </a>
+        <a
+          className="popup-action-btn"
+          href="https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension"
+          target="_blank"
+          rel="noreferrer">
+          <span>Site</span>
+        </a>
+      </div>
     </div>
   )
 }
