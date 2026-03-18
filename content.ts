@@ -8,6 +8,7 @@ const CHIP_ATTR = "data-goodlib-zlib-chip"
 const CHIP_CLASS = "goodlib-chip"
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
+const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 
 const titleSelectors = [
@@ -186,13 +187,19 @@ const syncChipToState = () => {
 }
 
 const initializeEnabledState = () => {
-  chrome.storage.sync.get([ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY], (result) => {
-    const zlibStored = result[ZLIB_ENABLED_KEY]
-    const annaStored = result[ANNA_ENABLED_KEY]
-    enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
-    enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
-    syncChipToState()
-  })
+  chrome.storage.sync.get(
+    [ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY, GUTENBERG_ENABLED_KEY],
+    (result) => {
+      const zlibStored = result[ZLIB_ENABLED_KEY]
+      const annaStored = result[ANNA_ENABLED_KEY]
+      const gutenbergStored = result[GUTENBERG_ENABLED_KEY]
+      enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
+      enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
+      enabledBySource.gutenberg =
+        typeof gutenbergStored === "boolean" ? gutenbergStored : true
+      syncChipToState()
+    }
+  )
 }
 
 initializeEnabledState()
@@ -222,6 +229,11 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if (ANNA_ENABLED_KEY in changes) {
     const annaNext = changes[ANNA_ENABLED_KEY].newValue
     enabledBySource.anna = typeof annaNext === "boolean" ? annaNext : true
+  }
+  if (GUTENBERG_ENABLED_KEY in changes) {
+    const gutenbergNext = changes[GUTENBERG_ENABLED_KEY].newValue
+    enabledBySource.gutenberg =
+      typeof gutenbergNext === "boolean" ? gutenbergNext : true
   }
   syncChipToState()
 })
