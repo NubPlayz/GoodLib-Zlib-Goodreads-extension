@@ -13,5 +13,9 @@
   font-weight: 600;
   line-height: 1;
   vertical-align: middle;
-  cursor: default;
+  cursor: pointer;
+}
+
+.goodlib-chip:hover {
+  background: #f7f8fa;
 }
