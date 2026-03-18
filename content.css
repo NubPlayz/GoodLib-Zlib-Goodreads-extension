@@ -63,6 +63,11 @@
   background: #00d1b2;
 }
 
+.goodlib-chip--gutenberg .goodlib-chip-icon {
+  background: #ffdd57;
+  color: #333333;
+}
+
 .goodlib-chip-glyph {
   font-size: 9px;
   font-weight: 800;
@@ -71,8 +76,17 @@
   transition: transform 0.3s;
 }
 
+.goodlib-chip-glyph--wide {
+  font-size: 8px;
+  transform: translateY(-0.5px) rotate(0deg);
+}
+
 .goodlib-chip:hover .goodlib-chip-glyph {
   transform: translateY(-1px) rotate(15deg);
+}
+
+.goodlib-chip:hover .goodlib-chip-glyph--wide {
+  transform: translateY(-0.5px) rotate(15deg);
 }
 
 .goodlib-chip-label {
