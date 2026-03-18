@@ -25,6 +25,10 @@
   gap: 12px;
 }
 
+.popup-row + .popup-row {
+  margin-top: 12px;
+}
+
 .popup-avatar {
   width: 36px;
   height: 36px;
@@ -36,6 +40,10 @@
   justify-content: center;
   font-weight: 700;
   flex: 0 0 auto;
+}
+
+.popup-avatar--anna {
+  background: #00d1b2;
 }
 
 .popup-copy {
@@ -97,4 +105,8 @@
 
 .popup-toggle input:checked + .popup-toggle-track::before {
   transform: translateX(22px);
+}
+
+.popup-toggle--anna input:checked + .popup-toggle-track {
+  background: #00b89c;
 }
