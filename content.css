@@ -1,21 +1,43 @@
 .goodlib-chip {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  height: 28px;
+  gap: 8px;
+  height: 34px;
   margin-left: 10px;
-  padding: 0 10px;
-  border: 1px solid #d7dbe0;
+  padding: 0 12px 0 8px;
+  border: 1px solid #dfe3e8;
   border-radius: 999px;
-  background: #ffffff;
-  color: #2f3337;
+  background: #f5f6f7;
+  color: #31363b;
   font-size: 14px;
   font-weight: 600;
   line-height: 1;
   vertical-align: middle;
   cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .goodlib-chip:hover {
-  background: #f7f8fa;
+  background: #eef1f5;
+  border-color: #d4dbe3;
+}
+
+.goodlib-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #3f72d8;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
+.goodlib-chip-label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
 }
