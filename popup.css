@@ -1,21 +1,38 @@
 .popup {
-  min-width: 280px;
-  padding: 16px;
+  min-width: 320px;
+  padding: 18px;
   font-family: Arial, sans-serif;
   background: #f5f7fb;
 }
 
 .popup-title {
-  margin: 0 0 12px;
-  font-size: 20px;
-  font-weight: 700;
+  margin: 0 0 14px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
   color: #1f2937;
+}
+
+.popup-title-base {
+  color: #2f3744;
+}
+
+.popup-title-l {
+  color: #ffb70f;
+}
+
+.popup-title-i {
+  color: #ffb70f;
+}
+
+.popup-title-b {
+  color: #ffb70f;
 }
 
 .popup-card {
   border: 1px solid #dde3ee;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 16px;
+  padding: 8px 14px;
   background: #ffffff;
 }
 
@@ -23,10 +40,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 14px 0;
 }
 
 .popup-row + .popup-row {
-  margin-top: 12px;
+  border-top: 1px solid #edf1f7;
 }
 
 .popup-avatar {
@@ -69,7 +87,7 @@
 
 .popup-subtitle {
   font-size: 12px;
-  color: #6b7280;
+  color: #9aa4b2;
   transition: color 0.28s ease;
 }
 

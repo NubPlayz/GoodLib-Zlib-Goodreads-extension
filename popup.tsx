@@ -63,7 +63,12 @@ function IndexPopup() {
 
   return (
     <div className="popup">
-      <h2 className="popup-title">Goodlib</h2>
+      <h2 className="popup-title">
+        <span className="popup-title-base">Good</span>
+        <span className="popup-title-l"> L</span>
+        <span className="popup-title-i">I</span>
+        <span className="popup-title-b">B</span>
+      </h2>
       <div className="popup-card">
         <div
           className={`popup-row anime-row-zlib ${!zlibEnabled ? "popup-row--off" : ""}`}>
