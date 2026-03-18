@@ -6,6 +6,8 @@ export const config = {
 
 const CHIP_ATTR = "data-goodlib-zlib-chip"
 const CHIP_CLASS = "goodlib-chip"
+const ZLIB_ENABLED_KEY = "zlibEnabled"
+const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 
 const titleSelectors = [
   "h1[data-testid='bookTitle']",
@@ -47,11 +49,47 @@ const getPrimaryAuthor = (): string => {
   return ""
 }
 
+const removeChip = () => {
+  const chips = document.querySelectorAll(`[${CHIP_ATTR}]`)
+  chips.forEach((chip) => chip.remove())
+
+  const wrap = document.querySelector(`[${CHIPS_WRAP_ATTR}]`)
+  if (wrap && wrap.childElementCount === 0) {
+    wrap.remove()
+  }
+}
+
+type SourceKey = "zlib" | "anna"
+
+const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
+  zlib: { label: "Z-Lib", glyph: "z" },
+  anna: { label: "Anna's", glyph: "A" }
+}
+
+const buildSourceUrl = (source: SourceKey, query: string) => {
+  const encoded = encodeURIComponent(query)
+  if (source === "anna") {
+    return `https://annas-archive.gd/search?q=${encoded}`
+  }
+
+  return `https://z-lib.gl/s/${encoded}`
+}
+
+const makeChip = (source: SourceKey, searchQuery: string) => {
+  const chip = document.createElement("span")
+  chip.setAttribute(CHIP_ATTR, source)
+  chip.className = `${CHIP_CLASS} ${CHIP_CLASS}--${source}`
+  chip.innerHTML = `<span class="goodlib-chip-icon"><span class="goodlib-chip-glyph">${sourceMeta[source].glyph}</span></span><span class="goodlib-chip-label">${sourceMeta[source].label}</span>`
+  chip.addEventListener("click", () => {
+    window.location.assign(buildSourceUrl(source, searchQuery))
+  })
+
+  return chip
+}
+
 const injectChip = () => {
   const title = getBookTitle()
   if (!title) return
-
-  if (title.querySelector(`[${CHIP_ATTR}]`)) return
 
   const bookTitle = normalizeText(title.textContent ?? "")
   if (!bookTitle) return
@@ -60,23 +98,49 @@ const injectChip = () => {
   const queryParts = [bookTitle, primaryAuthor].filter(Boolean)
   const searchQuery = queryParts.join(" ")
 
-  const chip = document.createElement("span")
-  chip.setAttribute(CHIP_ATTR, "true")
-  chip.className = CHIP_CLASS
-  chip.innerHTML = `<span class="goodlib-chip-icon"><span class="goodlib-chip-glyph">z</span></span><span class="goodlib-chip-label">Z-Lib</span>`
-  chip.addEventListener("click", () => {
-    const query = encodeURIComponent(searchQuery)
-    window.location.assign(`https://z-lib.gl/s/${query}`)
-  })
+  let wrap = title.querySelector(`[${CHIPS_WRAP_ATTR}]`)
+  if (!(wrap instanceof HTMLElement)) {
+    wrap = document.createElement("span")
+    wrap.setAttribute(CHIPS_WRAP_ATTR, "true")
+    wrap.className = "goodlib-chip-wrap"
+    title.appendChild(wrap)
+  }
 
-  title.appendChild(chip)
+  if (!wrap.querySelector(`[${CHIP_ATTR}="zlib"]`)) {
+    wrap.appendChild(makeChip("zlib", searchQuery))
+  }
+
+  if (!wrap.querySelector(`[${CHIP_ATTR}="anna"]`)) {
+    wrap.appendChild(makeChip("anna", searchQuery))
+  }
 }
 
-injectChip()
+let isZlibEnabled = true
+
+const syncChipToState = () => {
+  if (!isZlibEnabled) {
+    removeChip()
+    return
+  }
+
+  injectChip()
+}
+
+const initializeEnabledState = () => {
+  chrome.storage.sync.get(ZLIB_ENABLED_KEY, (result) => {
+    const stored = result[ZLIB_ENABLED_KEY]
+    isZlibEnabled = typeof stored === "boolean" ? stored : true
+    syncChipToState()
+  })
+}
+
+initializeEnabledState()
 
 let injectTimeout: ReturnType<typeof setTimeout> | null = null
 
 const observer = new MutationObserver(() => {
+  if (!isZlibEnabled) return
+
   if (injectTimeout) {
     clearTimeout(injectTimeout)
   }
@@ -87,3 +151,12 @@ const observer = new MutationObserver(() => {
 })
 
 observer.observe(document.body, { childList: true, subtree: true })
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "sync") return
+  if (!(ZLIB_ENABLED_KEY in changes)) return
+
+  const nextValue = changes[ZLIB_ENABLED_KEY].newValue
+  isZlibEnabled = typeof nextValue === "boolean" ? nextValue : true
+  syncChipToState()
+})
