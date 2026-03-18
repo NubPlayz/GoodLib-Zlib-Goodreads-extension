@@ -7,6 +7,7 @@ export const config = {
 const CHIP_ATTR = "data-goodlib-zlib-chip"
 const CHIP_CLASS = "goodlib-chip"
 const ZLIB_ENABLED_KEY = "zlibEnabled"
+const ANNA_ENABLED_KEY = "annaEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 
 const titleSelectors = [
@@ -59,6 +60,18 @@ const removeChip = () => {
   }
 }
 
+const removeChipBySource = (source: SourceKey) => {
+  const chip = document.querySelector(`[${CHIP_ATTR}="${source}"]`)
+  if (chip) {
+    chip.remove()
+  }
+
+  const wrap = document.querySelector(`[${CHIPS_WRAP_ATTR}]`)
+  if (wrap && wrap.childElementCount === 0) {
+    wrap.remove()
+  }
+}
+
 type SourceKey = "zlib" | "anna"
 
 const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
@@ -87,7 +100,7 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
   return chip
 }
 
-const injectChip = () => {
+const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
   const title = getBookTitle()
   if (!title) return
 
@@ -106,30 +119,43 @@ const injectChip = () => {
     title.appendChild(wrap)
   }
 
-  if (!wrap.querySelector(`[${CHIP_ATTR}="zlib"]`)) {
+  if (enabledBySource.zlib && !wrap.querySelector(`[${CHIP_ATTR}="zlib"]`)) {
     wrap.appendChild(makeChip("zlib", searchQuery))
   }
 
-  if (!wrap.querySelector(`[${CHIP_ATTR}="anna"]`)) {
+  if (!enabledBySource.zlib) {
+    removeChipBySource("zlib")
+  }
+
+  if (enabledBySource.anna && !wrap.querySelector(`[${CHIP_ATTR}="anna"]`)) {
     wrap.appendChild(makeChip("anna", searchQuery))
+  }
+
+  if (!enabledBySource.anna) {
+    removeChipBySource("anna")
   }
 }
 
-let isZlibEnabled = true
+const enabledBySource: Record<SourceKey, boolean> = {
+  zlib: true,
+  anna: true
+}
 
 const syncChipToState = () => {
-  if (!isZlibEnabled) {
+  if (!enabledBySource.zlib && !enabledBySource.anna) {
     removeChip()
     return
   }
 
-  injectChip()
+  injectChips(enabledBySource)
 }
 
 const initializeEnabledState = () => {
-  chrome.storage.sync.get(ZLIB_ENABLED_KEY, (result) => {
-    const stored = result[ZLIB_ENABLED_KEY]
-    isZlibEnabled = typeof stored === "boolean" ? stored : true
+  chrome.storage.sync.get([ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY], (result) => {
+    const zlibStored = result[ZLIB_ENABLED_KEY]
+    const annaStored = result[ANNA_ENABLED_KEY]
+    enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
+    enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
     syncChipToState()
   })
 }
@@ -139,14 +165,14 @@ initializeEnabledState()
 let injectTimeout: ReturnType<typeof setTimeout> | null = null
 
 const observer = new MutationObserver(() => {
-  if (!isZlibEnabled) return
+  if (!enabledBySource.zlib && !enabledBySource.anna) return
 
   if (injectTimeout) {
     clearTimeout(injectTimeout)
   }
 
   injectTimeout = setTimeout(() => {
-    injectChip()
+    injectChips(enabledBySource)
   }, 120)
 })
 
@@ -154,9 +180,13 @@ observer.observe(document.body, { childList: true, subtree: true })
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "sync") return
-  if (!(ZLIB_ENABLED_KEY in changes)) return
-
-  const nextValue = changes[ZLIB_ENABLED_KEY].newValue
-  isZlibEnabled = typeof nextValue === "boolean" ? nextValue : true
+  if (ZLIB_ENABLED_KEY in changes) {
+    const zlibNext = changes[ZLIB_ENABLED_KEY].newValue
+    enabledBySource.zlib = typeof zlibNext === "boolean" ? zlibNext : true
+  }
+  if (ANNA_ENABLED_KEY in changes) {
+    const annaNext = changes[ANNA_ENABLED_KEY].newValue
+    enabledBySource.anna = typeof annaNext === "boolean" ? annaNext : true
+  }
   syncChipToState()
 })
