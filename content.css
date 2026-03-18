@@ -1,17 +1,23 @@
+.goodlib-chip-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+}
+
 .goodlib-chip {
   display: inline-flex;
   align-items: center;
-  height: 32px;
-  margin-left: 10px;
-  padding: 0px 14px 0px 10px;
+  height: 28px;
+  padding: 0px 12px 0px 8px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   text-decoration: none;
-  color: #2f3337;
-  font-size: 15px;
-  font-weight: 500;
+  color: rgb(51, 51, 51);
+  font-size: 11px;
+  font-weight: 700;
   line-height: 1;
   vertical-align: middle;
   cursor: pointer;
@@ -20,10 +26,10 @@
   z-index: 10;
   pointer-events: auto;
   transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
+    transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    border-color 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    background 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -41,23 +47,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: rgb(50, 115, 220);
-  padding: 0;
   margin-right: 8px;
+  font-size: 9px;
+  font-weight: 800;
   color: white;
   flex-shrink: 0;
   line-height: 1;
 }
 
+.goodlib-chip--anna .goodlib-chip-icon {
+  background: #00d1b2;
+}
+
 .goodlib-chip-glyph {
-  font-size: 15px;
-  font-weight: 669;
+  font-size: 9px;
+  font-weight: 800;
   line-height: 1;
   transform: translateY(-1px) rotate(0deg);
-  transition: transform 0.25s ease;
+  transition: transform 0.3s;
 }
 
 .goodlib-chip:hover .goodlib-chip-glyph {
@@ -65,7 +76,7 @@
 }
 
 .goodlib-chip-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: rgb(51, 51, 51);
   line-height: 1;
