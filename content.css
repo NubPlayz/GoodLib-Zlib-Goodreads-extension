@@ -11,7 +11,7 @@
   text-decoration: none;
   color: #2f3337;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   vertical-align: middle;
   cursor: pointer;
@@ -54,7 +54,7 @@
 
 .goodlib-chip-glyph {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 669;
   line-height: 1;
   transform: translateY(-1px) rotate(0deg);
   transition: transform 0.25s ease;
