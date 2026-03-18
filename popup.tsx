@@ -147,7 +147,7 @@ function IndexPopup() {
         </a>
         <a
           className="popup-action-btn"
-          href="https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension"
+          href="https://goodlib.vercel.app"
           target="_blank"
           rel="noreferrer">
           <span>Site</span>

@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
+    "build:firefox": "plasmo build --target=firefox-mv2",
     "package": "plasmo package"
   },
   "dependencies": {
@@ -25,11 +26,17 @@
     "typescript": "5.3.3"
   },
   "manifest": {
-    "permissions": [
-      "storage"
-    ],
+    "permissions": ["storage"],
     "host_permissions": [
-      "https://*/*"
-    ]
+      "https://*.goodreads.com/*",
+      "https://z-lib.gl/*",
+      "https://annas-archive.gd/*",
+      "https://www.gutenberg.org/*"
+    ],
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "goodlib@yourdomain.com"
+      }
+    }
   }
 }
