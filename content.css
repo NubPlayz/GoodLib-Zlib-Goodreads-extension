@@ -2,24 +2,32 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 34px;
+  height: 28px;
   margin-left: 10px;
   padding: 0 12px 0 8px;
-  border: 1px solid #dfe3e8;
-  border-radius: 999px;
-  background: #f5f6f7;
-  color: #31363b;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #2f3337;
   font-size: 14px;
   font-weight: 600;
   line-height: 1;
   vertical-align: middle;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(8px);
 }
 
 .goodlib-chip:hover {
-  background: #eef1f5;
-  border-color: #d4dbe3;
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .goodlib-chip-icon {
@@ -29,9 +37,9 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #3f72d8;
+  background: #3b73db;
   color: #ffffff;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   text-transform: lowercase;
 }
