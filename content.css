@@ -1,0 +1,17 @@
+.goodlib-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  margin-left: 10px;
+  padding: 0 10px;
+  border: 1px solid #d7dbe0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2f3337;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: default;
+}
