@@ -13,11 +13,12 @@ const titleSelectors = [
   "h1"
 ]
 
-const contributorSelectors = [
-  "a.ContributorLink",
-  "span.ContributorLink__name",
+const authorSelectors = [
   "a[data-testid='name']",
-  "[data-testid='authorName']"
+  "[data-testid='authorName']",
+  ".ContributorLinksList a.ContributorLink",
+  "a.ContributorLink",
+  "span.ContributorLink__name"
 ]
 
 const getBookTitle = (): HTMLElement | null => {
@@ -33,21 +34,17 @@ const getBookTitle = (): HTMLElement | null => {
 
 const normalizeText = (value: string) => value.replace(/\s+/g, " ").trim()
 
-const getContributorText = (): string[] => {
-  const values = new Set<string>()
-
-  for (const selector of contributorSelectors) {
-    const nodes = document.querySelectorAll(selector)
-    for (const node of nodes) {
-      if (!(node instanceof HTMLElement)) continue
-      const text = normalizeText(node.innerText)
-      if (text.length > 0) {
-        values.add(text)
-      }
+const getPrimaryAuthor = (): string => {
+  for (const selector of authorSelectors) {
+    const node = document.querySelector(selector)
+    if (!(node instanceof HTMLElement)) continue
+    const text = normalizeText(node.innerText)
+    if (text.length > 0) {
+      return text
     }
   }
 
-  return [...values]
+  return ""
 }
 
 const injectChip = () => {
@@ -59,8 +56,8 @@ const injectChip = () => {
   const bookTitle = normalizeText(title.textContent ?? "")
   if (!bookTitle) return
 
-  const contributors = getContributorText()
-  const queryParts = [bookTitle, ...contributors].filter(Boolean)
+  const primaryAuthor = getPrimaryAuthor()
+  const queryParts = [bookTitle, primaryAuthor].filter(Boolean)
   const searchQuery = queryParts.join(" ")
 
   const chip = document.createElement("span")
