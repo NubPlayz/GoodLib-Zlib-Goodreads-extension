@@ -1,15 +1,16 @@
 .goodlib-chip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 28px;
+  height: 32px;
   margin-left: 10px;
-  padding: 0 12px 0 8px;
+  padding: 0px 14px 0px 10px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  text-decoration: none;
   color: #2f3337;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1;
   vertical-align: middle;
@@ -18,34 +19,55 @@
   position: relative;
   z-index: 10;
   pointer-events: auto;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  backdrop-filter: blur(8px);
+  transform: scale(1) translateY(0px);
 }
 
 .goodlib-chip:hover {
   background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: scale(1.06) translateY(-1px);
 }
 
 .goodlib-chip-icon {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: #3b73db;
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
-  text-transform: lowercase;
+  background: rgb(50, 115, 220);
+  padding: 0;
+  margin-right: 8px;
+  color: white;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.goodlib-chip-glyph {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  transform: translateY(-1px) rotate(0deg);
+  transition: transform 0.25s ease;
+}
+
+.goodlib-chip:hover .goodlib-chip-glyph {
+  transform: translateY(-1px) rotate(15deg);
 }
 
 .goodlib-chip-label {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.1px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(51, 51, 51);
+  line-height: 1;
+  letter-spacing: -0.2px;
 }
