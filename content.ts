@@ -63,7 +63,7 @@ const injectChip = () => {
   const chip = document.createElement("span")
   chip.setAttribute(CHIP_ATTR, "true")
   chip.className = CHIP_CLASS
-  chip.textContent = "Z-Lib"
+  chip.innerHTML = `<span class="goodlib-chip-icon">z</span><span class="goodlib-chip-label">Z-Lib</span>`
   chip.addEventListener("click", () => {
     const query = encodeURIComponent(searchQuery)
     window.location.assign(`https://z-lib.gl/s/${query}`)
