@@ -54,11 +54,47 @@
 }
 
 .popup-toggle {
+  position: relative;
+  width: 52px;
+  height: 30px;
   display: flex;
   align-items: center;
 }
 
 .popup-toggle input {
-  width: 18px;
-  height: 18px;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.popup-toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #d1d5db;
+  transition: background 0.2s ease;
+}
+
+.popup-toggle-track::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.popup-toggle input:checked + .popup-toggle-track {
+  background: #3b82f6;
+}
+
+.popup-toggle input:checked + .popup-toggle-track::before {
+  transform: translateX(22px);
 }
