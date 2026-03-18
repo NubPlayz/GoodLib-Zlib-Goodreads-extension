@@ -14,7 +14,8 @@ function IndexPopup() {
             <div className="popup-subtitle">z-lib.gl</div>
           </div>
           <label className="popup-toggle">
-            <input type="checkbox" defaultChecked  />
+            <input type="checkbox" defaultChecked />
+            <span className="popup-toggle-track" />
           </label>
         </div>
       </div>
