@@ -6,11 +6,18 @@
 }
 
 .popup-title {
-  margin: 0 0 14px;
+  margin: 0;
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.3px;
   color: #1f2937;
+}
+
+.popup-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
 .popup-title-base {
@@ -18,15 +25,34 @@
 }
 
 .popup-title-l {
-  color: #ffb70f;
+  color:  #ffb70f;
+  margin-left: 2px;
 }
 
 .popup-title-i {
-  color: #ffb70f;
+  color:  #ffb70f;
 }
 
 .popup-title-b {
   color: #ffb70f;
+}
+
+.popup-mascot {
+  width: 68px;
+  height: 68px;
+  border-radius: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-mascot-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .popup-card {

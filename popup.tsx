@@ -2,6 +2,7 @@ import { animate } from "animejs"
 import { useEffect, useState } from "react"
 
 import "./popup.css"
+import mascotCat from "./mascot cat.png"
 
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
@@ -63,12 +64,17 @@ function IndexPopup() {
 
   return (
     <div className="popup">
-      <h2 className="popup-title">
-        <span className="popup-title-base">Good</span>
-        <span className="popup-title-l"> L</span>
-        <span className="popup-title-i">I</span>
-        <span className="popup-title-b">B</span>
-      </h2>
+      <div className="popup-header">
+        <h2 className="popup-title">
+          <span className="popup-title-base">Good</span>
+          <span className="popup-title-l">L</span>
+          <span className="popup-title-i">I</span>
+          <span className="popup-title-b">B</span>
+        </h2>
+        <div className="popup-mascot" aria-label="Goodlib mascot cat" title="Mascot">
+          <img className="popup-mascot-image" src={mascotCat} alt="Mascot cat" />
+        </div>
+      </div>
       <div className="popup-card">
         <div
           className={`popup-row anime-row-zlib ${!zlibEnabled ? "popup-row--off" : ""}`}>
