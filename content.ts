@@ -60,17 +60,21 @@ const removeChip = () => {
   }
 }
 
-type SourceKey = "zlib" | "anna"
+type SourceKey = "zlib" | "anna" | "gutenberg"
 
 const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
   zlib: { label: "Z-Lib", glyph: "z" },
-  anna: { label: "Anna's", glyph: "A" }
+  anna: { label: "Anna's", glyph: "A" },
+  gutenberg: { label: "Gutenberg", glyph: "PG" }
 }
 
 const buildSourceUrl = (source: SourceKey, query: string) => {
   const encoded = encodeURIComponent(query)
   if (source === "anna") {
     return `https://annas-archive.gd/search?q=${encoded}`
+  }
+  if (source === "gutenberg") {
+    return "https://www.gutenberg.org/"
   }
 
   return `https://z-lib.gl/s/${encoded}`
@@ -81,7 +85,10 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
   chip.setAttribute(CHIP_ATTR, source)
   chip.className = `${CHIP_CLASS} ${CHIP_CLASS}--${source}`
   chip.setAttribute("data-search-query", searchQuery)
-  chip.innerHTML = `<span class="goodlib-chip-icon"><span class="goodlib-chip-glyph">${sourceMeta[source].glyph}</span></span><span class="goodlib-chip-label">${sourceMeta[source].label}</span>`
+  const glyph = sourceMeta[source].glyph
+  const glyphClass =
+    glyph.length > 1 ? "goodlib-chip-glyph goodlib-chip-glyph--wide" : "goodlib-chip-glyph"
+  chip.innerHTML = `<span class="goodlib-chip-icon"><span class="${glyphClass}">${glyph}</span></span><span class="goodlib-chip-label">${sourceMeta[source].label}</span>`
   chip.addEventListener("click", () => {
     const query = chip.getAttribute("data-search-query") ?? searchQuery
     window.location.assign(buildSourceUrl(source, query))
@@ -129,6 +136,15 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
     orderedChips.push(annaChip)
   }
 
+  let gutenbergChip = wrap.querySelector(`[${CHIP_ATTR}="gutenberg"]`)
+  if (!(gutenbergChip instanceof HTMLElement) && enabledBySource.gutenberg) {
+    gutenbergChip = makeChip("gutenberg", searchQuery)
+  }
+  if (gutenbergChip instanceof HTMLElement && enabledBySource.gutenberg) {
+    gutenbergChip.setAttribute("data-search-query", searchQuery)
+    orderedChips.push(gutenbergChip)
+  }
+
   const currentOrder = Array.from(wrap.children).filter(
     (node) => node instanceof HTMLElement && node.hasAttribute(CHIP_ATTR)
   )
@@ -144,11 +160,12 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
 
 const enabledBySource: Record<SourceKey, boolean> = {
   zlib: true,
-  anna: true
+  anna: true,
+  gutenberg: true
 }
 
 const syncChipToState = () => {
-  if (!enabledBySource.zlib && !enabledBySource.anna) {
+  if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) {
     removeChip()
     return
   }
@@ -171,7 +188,7 @@ initializeEnabledState()
 let injectTimeout: ReturnType<typeof setTimeout> | null = null
 
 const observer = new MutationObserver(() => {
-  if (!enabledBySource.zlib && !enabledBySource.anna) return
+  if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) return
 
   if (injectTimeout) {
     clearTimeout(injectTimeout)
