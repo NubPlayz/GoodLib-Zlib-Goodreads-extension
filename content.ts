@@ -60,18 +60,6 @@ const removeChip = () => {
   }
 }
 
-const removeChipBySource = (source: SourceKey) => {
-  const chip = document.querySelector(`[${CHIP_ATTR}="${source}"]`)
-  if (chip) {
-    chip.remove()
-  }
-
-  const wrap = document.querySelector(`[${CHIPS_WRAP_ATTR}]`)
-  if (wrap && wrap.childElementCount === 0) {
-    wrap.remove()
-  }
-}
-
 type SourceKey = "zlib" | "anna"
 
 const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
@@ -92,9 +80,11 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
   const chip = document.createElement("span")
   chip.setAttribute(CHIP_ATTR, source)
   chip.className = `${CHIP_CLASS} ${CHIP_CLASS}--${source}`
+  chip.setAttribute("data-search-query", searchQuery)
   chip.innerHTML = `<span class="goodlib-chip-icon"><span class="goodlib-chip-glyph">${sourceMeta[source].glyph}</span></span><span class="goodlib-chip-label">${sourceMeta[source].label}</span>`
   chip.addEventListener("click", () => {
-    window.location.assign(buildSourceUrl(source, searchQuery))
+    const query = chip.getAttribute("data-search-query") ?? searchQuery
+    window.location.assign(buildSourceUrl(source, query))
   })
 
   return chip
@@ -119,20 +109,36 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
     title.appendChild(wrap)
   }
 
-  if (enabledBySource.zlib && !wrap.querySelector(`[${CHIP_ATTR}="zlib"]`)) {
-    wrap.appendChild(makeChip("zlib", searchQuery))
+  const orderedChips: HTMLElement[] = []
+
+  let zlibChip = wrap.querySelector(`[${CHIP_ATTR}="zlib"]`)
+  if (!(zlibChip instanceof HTMLElement) && enabledBySource.zlib) {
+    zlibChip = makeChip("zlib", searchQuery)
+  }
+  if (zlibChip instanceof HTMLElement && enabledBySource.zlib) {
+    zlibChip.setAttribute("data-search-query", searchQuery)
+    orderedChips.push(zlibChip)
   }
 
-  if (!enabledBySource.zlib) {
-    removeChipBySource("zlib")
+  let annaChip = wrap.querySelector(`[${CHIP_ATTR}="anna"]`)
+  if (!(annaChip instanceof HTMLElement) && enabledBySource.anna) {
+    annaChip = makeChip("anna", searchQuery)
+  }
+  if (annaChip instanceof HTMLElement && enabledBySource.anna) {
+    annaChip.setAttribute("data-search-query", searchQuery)
+    orderedChips.push(annaChip)
   }
 
-  if (enabledBySource.anna && !wrap.querySelector(`[${CHIP_ATTR}="anna"]`)) {
-    wrap.appendChild(makeChip("anna", searchQuery))
-  }
+  const currentOrder = Array.from(wrap.children).filter(
+    (node) => node instanceof HTMLElement && node.hasAttribute(CHIP_ATTR)
+  )
 
-  if (!enabledBySource.anna) {
-    removeChipBySource("anna")
+  const needsReorder =
+    currentOrder.length !== orderedChips.length ||
+    currentOrder.some((node, index) => node !== orderedChips[index])
+
+  if (needsReorder) {
+    wrap.replaceChildren(...orderedChips)
   }
 }
 
