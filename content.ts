@@ -37,6 +37,16 @@ const getBookTitle = (): HTMLElement | null => {
 
 const normalizeText = (value: string) => value.replace(/\s+/g, " ").trim()
 
+const getCleanBookTitle = (title: HTMLElement): string => {
+  const clone = title.cloneNode(true) as HTMLElement
+  const injectedWrap = clone.querySelector(`[${CHIPS_WRAP_ATTR}]`)
+  if (injectedWrap) {
+    injectedWrap.remove()
+  }
+
+  return normalizeText(clone.textContent ?? "")
+}
+
 const getPrimaryAuthor = (): string => {
   for (const selector of authorSelectors) {
     const node = document.querySelector(selector)
@@ -49,6 +59,9 @@ const getPrimaryAuthor = (): string => {
 
   return ""
 }
+
+const buildSearchQuery = (title: string, author?: string) =>
+  [title, author].filter(Boolean).join(" ")
 
 const removeChip = () => {
   const chips = document.querySelectorAll(`[${CHIP_ATTR}]`)
@@ -101,12 +114,11 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
   const title = getBookTitle()
   if (!title) return
 
-  const bookTitle = normalizeText(title.textContent ?? "")
+  const bookTitle = getCleanBookTitle(title)
   if (!bookTitle) return
 
   const primaryAuthor = getPrimaryAuthor()
-  const queryParts = [bookTitle, primaryAuthor].filter(Boolean)
-  const searchQuery = queryParts.join(" ")
+  const searchQuery = buildSearchQuery(bookTitle, primaryAuthor)
 
   let wrap = title.querySelector(`[${CHIPS_WRAP_ATTR}]`)
   if (!(wrap instanceof HTMLElement)) {
