@@ -40,6 +40,10 @@
   justify-content: center;
   font-weight: 700;
   flex: 0 0 auto;
+  transition:
+    background-color 0.28s ease,
+    color 0.28s ease,
+    border-color 0.28s ease;
 }
 
 .popup-avatar--anna {
@@ -60,11 +64,27 @@
 .popup-name {
   font-weight: 700;
   color: #111827;
+  transition: color 0.28s ease;
 }
 
 .popup-subtitle {
   font-size: 12px;
   color: #6b7280;
+  transition: color 0.28s ease;
+}
+
+.popup-row--off .popup-avatar {
+  background: #edf1f7;
+  color: #5c6678;
+  border: 1px solid #e2e8f0;
+}
+
+.popup-row--off .popup-name {
+  color: #374151;
+}
+
+.popup-row--off .popup-subtitle {
+  color: #9ca3af;
 }
 
 .popup-toggle {
@@ -88,8 +108,10 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: #d1d5db;
-  transition: background 0.2s ease;
+  background: #e2e8f0;
+  transition:
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .popup-toggle-track::before {
@@ -102,21 +124,21 @@
   border-radius: 50%;
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.popup-toggle input:checked + .popup-toggle-track {
+.popup-toggle input:checked + .popup-toggle-track.zlib-switch {
   background: #3b82f6;
+}
+
+.popup-toggle input:checked + .popup-toggle-track.anna-switch {
+  background: #10b981;
+}
+
+.popup-toggle input:checked + .popup-toggle-track.gutenberg-switch {
+  background: #f59e0b;
 }
 
 .popup-toggle input:checked + .popup-toggle-track::before {
   transform: translateX(22px);
-}
-
-.popup-toggle--anna input:checked + .popup-toggle-track {
-  background: #00b89c;
-}
-
-.popup-toggle--gutenberg input:checked + .popup-toggle-track {
-  background: #f4a300;
 }
