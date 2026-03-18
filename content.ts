@@ -87,7 +87,7 @@ const buildSourceUrl = (source: SourceKey, query: string) => {
     return `https://annas-archive.gd/search?q=${encoded}`
   }
   if (source === "gutenberg") {
-    return "https://www.gutenberg.org/"
+    return `https://www.gutenberg.org/ebooks/search/?query=${encoded}`
   }
 
   return `https://z-lib.gl/s/${encoded}`
