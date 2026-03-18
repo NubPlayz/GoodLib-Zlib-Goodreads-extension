@@ -30,10 +30,18 @@ const injectChip = () => {
 
   if (title.querySelector(`[${CHIP_ATTR}]`)) return
 
+  const bookTitle = title.textContent?.trim()
+  if (!bookTitle) return
+
   const chip = document.createElement("span")
   chip.setAttribute(CHIP_ATTR, "true")
   chip.className = CHIP_CLASS
   chip.textContent = "Z-Lib"
+  chip.addEventListener("click", () => {
+    const query = encodeURIComponent(bookTitle)
+    window.location.assign(`https://z-lib.gl/s/${query}`)
+  })
+
   title.appendChild(chip)
 }
 
