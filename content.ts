@@ -105,7 +105,7 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
   chip.innerHTML = `<span class="goodlib-chip-icon"><span class="${glyphClass}">${glyph}</span></span><span class="goodlib-chip-label">${sourceMeta[source].label}</span>`
   chip.addEventListener("click", () => {
     const query = chip.getAttribute("data-search-query") ?? searchQuery
-    window.location.assign(buildSourceUrl(source, query))
+    window.open(buildSourceUrl(source, query), "_blank", "noopener,noreferrer")
   })
 
   return chip
