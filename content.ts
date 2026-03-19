@@ -102,7 +102,20 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
   const glyph = sourceMeta[source].glyph
   const glyphClass =
     glyph.length > 1 ? "goodlib-chip-glyph goodlib-chip-glyph--wide" : "goodlib-chip-glyph"
-  chip.innerHTML = `<span class="goodlib-chip-icon"><span class="${glyphClass}">${glyph}</span></span><span class="goodlib-chip-label">${sourceMeta[source].label}</span>`
+
+  const icon = document.createElement("span")
+  icon.className = "goodlib-chip-icon"
+
+  const glyphNode = document.createElement("span")
+  glyphNode.className = glyphClass
+  glyphNode.textContent = glyph
+  icon.appendChild(glyphNode)
+
+  const label = document.createElement("span")
+  label.className = "goodlib-chip-label"
+  label.textContent = sourceMeta[source].label
+
+  chip.replaceChildren(icon, label)
   chip.addEventListener("click", () => {
     const query = chip.getAttribute("data-search-query") ?? searchQuery
     window.open(buildSourceUrl(source, query), "_blank", "noopener,noreferrer")

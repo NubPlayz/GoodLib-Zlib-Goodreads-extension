@@ -1,5 +1,4 @@
 import { animate } from "animejs"
-import { useEffect, useState } from "react"
 
 import "./popup.css"
 import mascotCat from "./mascot cat.png"
@@ -7,154 +6,239 @@ import mascotCat from "./mascot cat.png"
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
+
 type SourceKey = "zlib" | "anna" | "gutenberg"
 
-function IndexPopup() {
-  const [zlibEnabled, setZlibEnabled] = useState(true)
-  const [annaEnabled, setAnnaEnabled] = useState(true)
-  const [gutenbergEnabled, setGutenbergEnabled] = useState(true)
+type SourceConfig = {
+  avatarClassName?: string
+  avatarText: string
+  label: string
+  rowClassName: string
+  storageKey: string
+  subtitle: string
+  tagClassName: string
+  trackClassName: string
+}
 
-  useEffect(() => {
-    chrome.storage.sync.get(
-      [ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY, GUTENBERG_ENABLED_KEY],
-      (result) => {
-      const zlibStored = result[ZLIB_ENABLED_KEY]
-      const annaStored = result[ANNA_ENABLED_KEY]
-      const gutenbergStored = result[GUTENBERG_ENABLED_KEY]
-      setZlibEnabled(typeof zlibStored === "boolean" ? zlibStored : true)
-      setAnnaEnabled(typeof annaStored === "boolean" ? annaStored : true)
-      setGutenbergEnabled(
-        typeof gutenbergStored === "boolean" ? gutenbergStored : true
-      )
-    })
-  }, [])
+type SourceElements = {
+  input: HTMLInputElement
+  row: HTMLDivElement
+}
 
-  const handleZlibToggleChange = (nextValue: boolean) => {
-    setZlibEnabled(nextValue)
-    chrome.storage.sync.set({ [ZLIB_ENABLED_KEY]: nextValue })
-    runToggleAnimation("zlib", nextValue)
+const sourceConfig: Record<SourceKey, SourceConfig> = {
+  zlib: {
+    avatarText: "Z",
+    label: "Z-Lib",
+    rowClassName: "anime-row-zlib",
+    storageKey: ZLIB_ENABLED_KEY,
+    subtitle: "z-lib.gl",
+    tagClassName: "anime-tag-zlib",
+    trackClassName: "zlib-switch"
+  },
+  anna: {
+    avatarClassName: "popup-avatar--anna",
+    avatarText: "A",
+    label: "Anna's",
+    rowClassName: "anime-row-anna",
+    storageKey: ANNA_ENABLED_KEY,
+    subtitle: "annas-archive.gd",
+    tagClassName: "anime-tag-anna",
+    trackClassName: "anna-switch"
+  },
+  gutenberg: {
+    avatarClassName: "popup-avatar--gutenberg",
+    avatarText: "PG",
+    label: "Project Gutenberg",
+    rowClassName: "anime-row-gutenberg",
+    storageKey: GUTENBERG_ENABLED_KEY,
+    subtitle: "gutenberg.org",
+    tagClassName: "anime-tag-gutenberg",
+    trackClassName: "gutenberg-switch"
+  }
+}
+
+const sourceKeys: SourceKey[] = ["zlib", "anna", "gutenberg"]
+
+const sourceElements = {} as Record<SourceKey, SourceElements>
+
+const createElement = <K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  className?: string,
+  textContent?: string
+) => {
+  const element = document.createElement(tagName)
+  if (className) {
+    element.className = className
+  }
+  if (textContent !== undefined) {
+    element.textContent = textContent
+  }
+  return element
+}
+
+const applySourceState = (source: SourceKey, isEnabled: boolean) => {
+  const elements = sourceElements[source]
+  if (!elements) {
+    return
   }
 
-  const handleAnnaToggleChange = (nextValue: boolean) => {
-    setAnnaEnabled(nextValue)
-    chrome.storage.sync.set({ [ANNA_ENABLED_KEY]: nextValue })
-    runToggleAnimation("anna", nextValue)
+  elements.input.checked = isEnabled
+  elements.row.classList.toggle("popup-row--off", !isEnabled)
+}
+
+const runToggleAnimation = (source: SourceKey, isEnabled: boolean) => {
+  animate(`.anime-row-${source}`, {
+    scale: [1, 0.96, 1],
+    duration: 400,
+    easing: "easeOutBack"
+  })
+
+  animate(`.anime-tag-${source}`, {
+    rotate: isEnabled ? "1turn" : "-1turn",
+    scale: isEnabled ? [1, 1.4, 1] : [1, 0.8, 1],
+    duration: 800,
+    easing: "easeOutElastic(1, .5)"
+  })
+}
+
+const createActionLink = (label: string, href: string, leadingText?: string) => {
+  const link = createElement("a", "popup-action-btn")
+  link.href = href
+  link.target = "_blank"
+  link.rel = "noopener noreferrer"
+
+  if (leadingText) {
+    const leading = createElement("span", "popup-action-star", leadingText)
+    leading.setAttribute("aria-hidden", "true")
+    link.appendChild(leading)
   }
 
-  const handleGutenbergToggleChange = (nextValue: boolean) => {
-    setGutenbergEnabled(nextValue)
-    chrome.storage.sync.set({ [GUTENBERG_ENABLED_KEY]: nextValue })
-    runToggleAnimation("gutenberg", nextValue)
-  }
+  link.appendChild(createElement("span", undefined, label))
 
-  const runToggleAnimation = (key: SourceKey, isOn: boolean) => {
-    animate(`.anime-row-${key}`, {
-      scale: [1, 0.96, 1],
-      duration: 400,
-      easing: "easeOutBack"
-    })
+  return link
+}
 
-    animate(`.anime-tag-${key}`, {
-      rotate: isOn ? "1turn" : "-1turn",
-      scale: isOn ? [1, 1.4, 1] : [1, 0.8, 1],
-      duration: 800,
-      easing: "easeOutElastic(1, .5)"
-    })
-  }
+const createPopupRow = (source: SourceKey) => {
+  const config = sourceConfig[source]
+  const row = createElement("div", `popup-row ${config.rowClassName}`)
 
-  return (
-    <div className="popup">
-      <div className="popup-header">
-        <h2 className="popup-title">
-          <span className="popup-title-base">Good</span>
-          <span className="popup-title-l">L</span>
-          <span className="popup-title-i">I</span>
-          <span className="popup-title-b">B</span>
-        </h2>
-        <div className="popup-mascot" aria-label="Goodlib mascot cat" title="Mascot">
-          <img className="popup-mascot-image" src={mascotCat} alt="Mascot cat" />
-        </div>
-      </div>
-      <div className="popup-card">
-        <div
-          className={`popup-row anime-row-zlib ${!zlibEnabled ? "popup-row--off" : ""}`}>
-          <div className="popup-avatar anime-tag-zlib">
-            Z
-          </div>
-          <div className="popup-copy">
-            <div className="popup-name">Z-Lib</div>
-            <div className="popup-subtitle">z-lib.gl</div>
-          </div>
-          <label className="popup-toggle">
-            <input
-              type="checkbox"
-              checked={zlibEnabled}
-              onChange={(event) => handleZlibToggleChange(event.target.checked)}
-            />
-            <span className="popup-toggle-track zlib-switch" />
-          </label>
-        </div>
+  const avatarClassName = [
+    "popup-avatar",
+    config.avatarClassName,
+    config.tagClassName
+  ]
+    .filter(Boolean)
+    .join(" ")
 
-        <div
-          className={`popup-row anime-row-anna ${!annaEnabled ? "popup-row--off" : ""}`}>
-          <div className="popup-avatar popup-avatar--anna anime-tag-anna">A</div>
-          <div className="popup-copy">
-            <div className="popup-name">Anna&apos;s</div>
-            <div className="popup-subtitle">annas-archive.gd</div>
-          </div>
-          <label className="popup-toggle popup-toggle--anna">
-            <input
-              type="checkbox"
-              checked={annaEnabled}
-              onChange={(event) => handleAnnaToggleChange(event.target.checked)}
-            />
-            <span className="popup-toggle-track anna-switch" />
-          </label>
-        </div>
+  const avatar = createElement("div", avatarClassName, config.avatarText)
 
-        <div
-          className={`popup-row anime-row-gutenberg ${!gutenbergEnabled ? "popup-row--off" : ""}`}>
-          <div className="popup-avatar popup-avatar--gutenberg anime-tag-gutenberg">
-            PG
-          </div>
-          <div className="popup-copy">
-            <div className="popup-name">Project Gutenberg</div>
-            <div className="popup-subtitle">gutenberg.org</div>
-          </div>
-          <label className="popup-toggle popup-toggle--gutenberg">
-            <input
-              type="checkbox"
-              checked={gutenbergEnabled}
-              onChange={(event) =>
-                handleGutenbergToggleChange(event.target.checked)
-              }
-            />
-            <span className="popup-toggle-track gutenberg-switch" />
-          </label>
-        </div>
-      </div>
+  const copy = createElement("div", "popup-copy")
+  copy.append(
+    createElement("div", "popup-name", config.label),
+    createElement("div", "popup-subtitle", config.subtitle)
+  )
 
-      <div className="popup-footer">
-        <a
-          className="popup-action-btn"
-          href="https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension"
-          target="_blank"
-          rel="noreferrer">
-          <span className="popup-action-star" aria-hidden="true">
-            ★
-          </span>
-          <span>GitHub</span>
-        </a>
-        <a
-          className="popup-action-btn"
-          href="https://goodlib.vercel.app"
-          target="_blank"
-          rel="noreferrer">
-          <span>Site</span>
-        </a>
-      </div>
-    </div>
+  const toggle = createElement("label", "popup-toggle")
+  const input = createElement("input") as HTMLInputElement
+  input.type = "checkbox"
+  input.checked = true
+  input.addEventListener("change", () => {
+    const nextValue = input.checked
+    applySourceState(source, nextValue)
+    chrome.storage.sync.set({ [config.storageKey]: nextValue })
+    runToggleAnimation(source, nextValue)
+  })
+
+  const track = createElement("span", `popup-toggle-track ${config.trackClassName}`)
+  toggle.append(input, track)
+
+  row.append(avatar, copy, toggle)
+  sourceElements[source] = { input, row }
+
+  return row
+}
+
+const syncFromStorage = () => {
+  chrome.storage.sync.get(
+    sourceKeys.map((source) => sourceConfig[source].storageKey),
+    (result) => {
+      for (const source of sourceKeys) {
+        const storedValue = result[sourceConfig[source].storageKey]
+        applySourceState(source, typeof storedValue === "boolean" ? storedValue : true)
+      }
+    }
   )
 }
 
-export default IndexPopup
+const mountPopup = () => {
+  const root = document.getElementById("__plasmo")
+  if (!(root instanceof HTMLElement) || root.childElementCount > 0) {
+    return
+  }
+
+  const popup = createElement("div", "popup")
+
+  const header = createElement("div", "popup-header")
+  const title = createElement("h2", "popup-title")
+  title.append(
+    createElement("span", "popup-title-base", "Good"),
+    createElement("span", "popup-title-l", "L"),
+    createElement("span", "popup-title-i", "I"),
+    createElement("span", "popup-title-b", "B")
+  )
+
+  const mascotWrap = createElement("div", "popup-mascot")
+  mascotWrap.setAttribute("aria-label", "Goodlib mascot cat")
+  mascotWrap.title = "Mascot"
+
+  const mascotImage = createElement("img", "popup-mascot-image") as HTMLImageElement
+  mascotImage.src = mascotCat
+  mascotImage.alt = "Mascot cat"
+  mascotWrap.appendChild(mascotImage)
+
+  header.append(title, mascotWrap)
+
+  const card = createElement("div", "popup-card")
+  for (const source of sourceKeys) {
+    card.appendChild(createPopupRow(source))
+  }
+
+  const footer = createElement("div", "popup-footer")
+  footer.append(
+    createActionLink(
+      "GitHub",
+      "https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension",
+      "*"
+    ),
+    createActionLink("Site", "https://goodlib.vercel.app")
+  )
+
+  popup.append(header, card, footer)
+  root.appendChild(popup)
+
+  syncFromStorage()
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "sync") {
+      return
+    }
+
+    for (const source of sourceKeys) {
+      const change = changes[sourceConfig[source].storageKey]
+      if (!change) {
+        continue
+      }
+
+      applySourceState(
+        source,
+        typeof change.newValue === "boolean" ? change.newValue : true
+      )
+    }
+  })
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", mountPopup, { once: true })
+} else {
+  mountPopup()
+}
