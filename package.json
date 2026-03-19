@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
-    "build:firefox": "plasmo build --target=firefox-mv2",
+    "build:firefox": "plasmo build --target=firefox-mv3",
     "package": "plasmo package"
   },
   "dependencies": {
@@ -32,7 +32,8 @@
       "gecko": {
         "id": "goodlib@NubPlayz.com",
         "data_collection_permissions": {
-          "required": ["websiteContent"]
+          "required": [],
+          "optional": []
         }
       }
     }
