@@ -13,7 +13,8 @@ GoodLib is a free, open source browser extension that injects source badges dire
 ## Features
 
 
-https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
+<img width="1280" height="800" alt="Untitled design (5)" src="https://github.com/user-attachments/assets/7debd26f-9192-4c7f-8714-503f9ed4febf" />
+
 
 
 
@@ -24,6 +25,14 @@ https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
 - **Animated UI** : powered by Anime.js v4
 - **Zero data collection** : the extension only activates on `goodreads.com/book/*`, collects nothing, and stores only your source toggle preferences locally
 - **Cross-browser** : works on Chrome (MV3) and Firefox (MV3)
+
+
+## Demo 
+
+
+https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
+
+
 
 
 ## Supported Sources
