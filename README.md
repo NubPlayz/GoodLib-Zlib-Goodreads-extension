@@ -35,6 +35,13 @@ https://goodlib.vercel.app
 
 https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
 
+## Install
+
+| Browser | Link |
+|---|---|
+| Chrome | [Chrome Web Store](https://chromewebstore.google.com/detail/goodlib-zlib-annas-archiv/aiampblkjnmfogckjfiecodcnenleehp) |
+| Firefox | [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/goodlib-zlib-anna-s-archive/) |
+| Firefox Mobile | [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/goodlib-zlib-anna-s-archive/) |
 
 
 
