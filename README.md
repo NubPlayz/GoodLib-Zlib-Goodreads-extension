@@ -26,6 +26,9 @@ GoodLib is a free, open source browser extension that injects source badges dire
 - **Zero data collection** : the extension only activates on `goodreads.com/book/*`, collects nothing, and stores only your source toggle preferences locally
 - **Cross-browser** : works on Chrome (MV3) and Firefox (MV3)
 
+## Landing page 
+
+https://goodlib.vercel.app
 
 ## Demo 
 
@@ -101,6 +104,10 @@ Approved on both the Chrome Web Store and Firefox Add-ons.
 Issues and PRs are welcome. If a source URL has changed or you want a new source added, open an issue.
 
 
+## Disclaimer
+ 
+Not affiliated with Goodreads, Z-Library, Anna's Archive, or Project Gutenberg.
+ 
 
 ## License
 
