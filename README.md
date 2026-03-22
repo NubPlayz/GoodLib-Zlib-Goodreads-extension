@@ -35,6 +35,16 @@ Learn more on [Offical site](https://goodlib.vercel.app)
 
 https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
 
+## Mobile view (firefox)
+
+![mobile 1](https://github.com/user-attachments/assets/e40fa86f-0758-4164-9871-8cb46ef4fd9c)
+
+--
+
+![mobile promo 2](https://github.com/user-attachments/assets/488e36fb-a881-4e04-a447-2cf861a28367)
+
+
+
 ## Install
 
 | Browser | Link |
