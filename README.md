@@ -1,4 +1,5 @@
-# GoodLib
+# <img width="128" height="128" alt="icon_128x128" src="https://github.com/user-attachments/assets/8e9dac2d-286b-4554-8a1a-423440989714" /> GoodLib
+
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=googlechrome)](YOUR_CWS_LINK)
 [![Firefox Add-ons](https://img.shields.io/badge/Firefox-Add--ons-orange?logo=firefox)](YOUR_AMO_LINK)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
