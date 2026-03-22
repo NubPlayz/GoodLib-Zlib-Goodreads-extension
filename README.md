@@ -1,13 +1,15 @@
 # GoodLib
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=googlechrome)](YOUR_CWS_LINK)
+[![Firefox Add-ons](https://img.shields.io/badge/Firefox-Add--ons-orange?logo=firefox)](YOUR_AMO_LINK)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
 
 **Open any Goodreads book on Anna's Archive, Z-Library, or Gutenberg in one click.**
 
 GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads book pages. No more copying titles and searching manually 
 
+Learn more on [Offical site](https://goodlib.vercel.app)
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=googlechrome)](YOUR_CWS_LINK)
-[![Firefox Add-ons](https://img.shields.io/badge/Firefox-Add--ons-orange?logo=firefox)](YOUR_AMO_LINK)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 
 ## Features
@@ -26,9 +28,7 @@ GoodLib is a free, open source browser extension that injects source badges dire
 - **Zero data collection** : the extension only activates on `goodreads.com/book/*`, collects nothing, and stores only your source toggle preferences locally
 - **Cross-browser** : works on Chrome (MV3) and Firefox (MV3)
 
-## Landing page 
 
-https://goodlib.vercel.app
 
 ## Demo 
 
