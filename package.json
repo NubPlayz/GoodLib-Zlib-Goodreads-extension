@@ -1,8 +1,8 @@
 {
   "name": "goodlib",
-  "displayName": "GoodLIB",
+  "displayName": "GoodLIB -Zlib & Anna's Archive Extension Goodreads",
   "version": "1.0.0",
-  "description": "A basic Plasmo extension.",
+  "description": "Open Books in Zlib Or Anna's Archive with a button on Goodreads in one click.",
   "author": "Plasmo Corp. <foss@plasmo.com>",
   "scripts": {
     "dev": "plasmo dev",
@@ -32,7 +32,7 @@
       "gecko": {
         "id": "goodlib@NubPlayz.com",
         "data_collection_permissions": {
-          "required": [],
+          "required": ["none"],
           "optional": []
         }
       }
