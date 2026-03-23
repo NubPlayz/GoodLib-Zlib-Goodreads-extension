@@ -130,10 +130,10 @@ The developers are not responsible for how the tool is used or what is accessed 
 
 Users are solely responsible for:
 
--- Ensuring they have the legal right to download any material they access
--- Complying with copyright laws and intellectual property rights in their jurisdiction
--- Understanding and accepting the terms of any sources they configure
--- Use of this tool is entirely at your own risk.
+- Ensuring they have the legal right to download any material they access
+- Complying with copyright laws and intellectual property rights in their jurisdiction
+- Understanding and accepting the terms of any sources they configure
+- Use of this tool is entirely at your own risk.
  
 Not affiliated with Goodreads, Z-Library, Anna's Archive, or Project Gutenberg.
  
