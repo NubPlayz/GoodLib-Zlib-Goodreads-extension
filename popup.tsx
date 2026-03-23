@@ -118,6 +118,21 @@ const createActionLink = (label: string, href: string, leadingText?: string) => 
   return link
 }
 
+const createSettingsBtn = () => {
+  const btn = createElement("button", "popup-action-btn popup-settings-btn")
+  
+  const icon = createElement("span", "popup-action-star", "⚙")
+  icon.setAttribute("aria-hidden", "true")
+  
+  btn.append(icon, createElement("span", undefined, "Settings"))
+  
+  btn.addEventListener("click", () => {
+    chrome.runtime.openOptionsPage()
+  })
+  
+  return btn
+}
+
 const createPopupRow = (source: SourceKey) => {
   const config = sourceConfig[source]
   const row = createElement("div", `popup-row ${config.rowClassName}`)
@@ -210,7 +225,8 @@ const mountPopup = () => {
       "https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension",
       "*"
     ),
-    createActionLink("Site", "https://goodlib.vercel.app")
+    createActionLink("Site", "https://goodlib.vercel.app"),
+    createSettingsBtn()
   )
 
   popup.append(header, card, footer)
