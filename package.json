@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "animejs": "^4.3.6",
-    "plasmo": "0.90.5"
+    "plasmo": "0.90.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
@@ -32,7 +34,9 @@
       "gecko": {
         "id": "goodlib@NubPlayz.com",
         "data_collection_permissions": {
-          "required": ["none"],
+          "required": [
+            "none"
+          ],
           "optional": []
         }
       }
