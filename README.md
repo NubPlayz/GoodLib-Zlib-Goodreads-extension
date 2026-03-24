@@ -44,6 +44,12 @@ https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
 
 ![mobile promo 2](https://github.com/user-attachments/assets/488e36fb-a881-4e04-a447-2cf861a28367)
 
+##  Mobile demo 
+
+https://github.com/user-attachments/assets/7f2a5aa0-b6c8-4a2d-be4d-8d6b4daaefb1
+
+
+
 
 
 ## Install
