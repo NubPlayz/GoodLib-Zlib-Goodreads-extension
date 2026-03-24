@@ -33,7 +33,7 @@
     },
     "host_permissions": [
       "https://www.goodreads.com/book/*",
-      "https://hardcover.app/books/*"
+      "https://hardcover.app/*"
     ],
     "browser_specific_settings": {
       "gecko": {

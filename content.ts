@@ -1,7 +1,7 @@
 import "./content.css"
 
 export const config = {
-  matches: ["https://www.goodreads.com/book/*", "https://hardcover.app/books/*"]
+  matches: ["https://www.goodreads.com/book/*", "https://hardcover.app/*"]
 }
 
 const CHIP_ATTR = "data-goodlib-zlib-chip"
@@ -176,6 +176,7 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
 }
 
 const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
+  debugger
   const title = getBookTitle()
   if (!title) return
 
