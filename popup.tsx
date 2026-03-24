@@ -132,6 +132,7 @@ const createSettingsBtn = () => {
 
   btn.addEventListener("click", () => {
     chrome.runtime.openOptionsPage()
+    window.close()
   })
 
   return btn
