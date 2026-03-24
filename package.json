@@ -1,7 +1,7 @@
 {
   "name": "goodlib",
-  "displayName": "GoodLIB -Zlib & Anna's Archive Extension Goodreads",
-  "version": "1.0.0",
+  "displayName": "GoodLIB -Zlib & Anna's Archive Extension",
+  "version": "1.0.2",
   "description": "Open books from Goodreads or Hardcover in Z-Library, Anna's Archive, or Gutenberg in one click.",
   "author": "Plasmo Corp. <foss@plasmo.com>",
   "scripts": {
@@ -27,6 +27,10 @@
     "permissions": [
       "storage"
     ],
+    "options_ui": {
+      "page": "options.html",
+      "open_in_tab": true
+    },
     "host_permissions": [
       "https://www.goodreads.com/book/*",
       "https://hardcover.app/books/*"

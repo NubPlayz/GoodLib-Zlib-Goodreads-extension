@@ -1,5 +1,6 @@
 .popup {
   min-width: 320px;
+  max-width: 350px;
   padding: 18px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
@@ -27,12 +28,12 @@
 }
 
 .popup-title-l {
-  color:  #ffb70f;
+  color: #ffb70f;
   margin-left: 2px;
 }
 
 .popup-title-i {
-  color:  #ffb70f;
+  color: #ffb70f;
 }
 
 .popup-title-b {
@@ -71,7 +72,7 @@
   padding: 15px 0;
 }
 
-.popup-row + .popup-row {
+.popup-row+.popup-row {
   border-top: 1px solid #edf1f7;
 }
 
@@ -181,19 +182,19 @@
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.popup-toggle input:checked + .popup-toggle-track.zlib-switch {
+.popup-toggle input:checked+.popup-toggle-track.zlib-switch {
   background: #3b82f6;
 }
 
-.popup-toggle input:checked + .popup-toggle-track.anna-switch {
+.popup-toggle input:checked+.popup-toggle-track.anna-switch {
   background: #10b981;
 }
 
-.popup-toggle input:checked + .popup-toggle-track.gutenberg-switch {
+.popup-toggle input:checked+.popup-toggle-track.gutenberg-switch {
   background: #f59e0b;
 }
 
-.popup-toggle input:checked + .popup-toggle-track::before {
+.popup-toggle input:checked+.popup-toggle-track::before {
   transform: translateX(22px);
 }
 
@@ -202,6 +203,14 @@
   display: flex;
   gap: 10px;
   justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.popup-footer-help {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 8px;
+  opacity: 1;
 }
 
 .popup-action-btn {
@@ -231,6 +240,10 @@
 
 .popup-footer .popup-action-btn {
   flex: 1;
+}
+
+.popup-settings-btn {
+  flex: 1 0 100% !important;
 }
 
 .popup-action-btn:hover {

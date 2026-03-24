@@ -6,6 +6,10 @@ import mascotCat from "./mascot cat.png"
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
+const ZLIB_DOMAIN_KEY = "zlibDomain"
+const DEFAULT_DOMAIN = "z-library.gs"
+const ANNA_DOMAIN_KEY = "annaDomain"
+const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
 
 type SourceKey = "zlib" | "anna" | "gutenberg"
 
@@ -120,16 +124,16 @@ const createActionLink = (label: string, href: string, leadingText?: string) => 
 
 const createSettingsBtn = () => {
   const btn = createElement("button", "popup-action-btn popup-settings-btn")
-  
+
   const icon = createElement("span", "popup-action-star", "⚙")
   icon.setAttribute("aria-hidden", "true")
-  
+
   btn.append(icon, createElement("span", undefined, "Settings"))
-  
+
   btn.addEventListener("click", () => {
     chrome.runtime.openOptionsPage()
   })
-  
+
   return btn
 }
 
@@ -175,8 +179,19 @@ const createPopupRow = (source: SourceKey) => {
 
 const syncFromStorage = () => {
   chrome.storage.sync.get(
-    sourceKeys.map((source) => sourceConfig[source].storageKey),
+    [...sourceKeys.map((source) => sourceConfig[source].storageKey), ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY],
     (result) => {
+
+      const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
+      if (zlibSubtitle) {
+        zlibSubtitle.textContent = result[ZLIB_DOMAIN_KEY] || DEFAULT_DOMAIN
+      }
+
+      const annaSubtitle = sourceElements.anna?.row.querySelector(".popup-subtitle")
+      if (annaSubtitle) {
+        annaSubtitle.textContent = result[ANNA_DOMAIN_KEY] || DEFAULT_ANNA_DOMAIN
+      }
+
       for (const source of sourceKeys) {
         const storedValue = result[sourceConfig[source].storageKey]
         applySourceState(source, typeof storedValue === "boolean" ? storedValue : true)
@@ -219,7 +234,10 @@ const mountPopup = () => {
   }
 
   const footer = createElement("div", "popup-footer")
+  const helpText = createElement("div", "popup-subtitle popup-footer-help", "Link not working? check settings!")
+
   footer.append(
+    helpText,
     createActionLink(
       "GitHub",
       "https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension",
@@ -237,6 +255,20 @@ const mountPopup = () => {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "sync") {
       return
+    }
+
+    if (ZLIB_DOMAIN_KEY in changes) {
+      const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
+      if (zlibSubtitle) {
+        zlibSubtitle.textContent = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_DOMAIN
+      }
+    }
+
+    if (ANNA_DOMAIN_KEY in changes) {
+      const annaSubtitle = sourceElements.anna?.row.querySelector(".popup-subtitle")
+      if (annaSubtitle) {
+        annaSubtitle.textContent = changes[ANNA_DOMAIN_KEY].newValue || DEFAULT_ANNA_DOMAIN
+      }
     }
 
     for (const source of sourceKeys) {
