@@ -10,6 +10,10 @@ const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
+const ZLIB_DOMAIN_KEY = "zlibDomain"
+const DEFAULT_DOMAIN = "z-library.gs"
+const ANNA_DOMAIN_KEY = "annaDomain"
+const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
 
 const titleSelectors = [
   "h1[data-testid='bookTitle']",
@@ -82,16 +86,19 @@ const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
   gutenberg: { label: "Gutenberg", glyph: "PG" }
 }
 
+let currentZlibDomain = DEFAULT_DOMAIN
+let currentAnnaDomain = DEFAULT_ANNA_DOMAIN
+
 const buildSourceUrl = (source: SourceKey, query: string) => {
   const encoded = encodeURIComponent(query)
   if (source === "anna") {
-    return `https://annas-archive.gd/search?q=${encoded}`
+    return `https://${currentAnnaDomain}/search?q=${encoded}`
   }
   if (source === "gutenberg") {
     return `https://www.gutenberg.org/ebooks/search/?query=${encoded}`
   }
 
-  return `https://z-lib.gl/s/${encoded}`
+  return `https://${currentZlibDomain}/s/${encoded}`
 }
 
 const makeChip = (source: SourceKey, searchQuery: string) => {
@@ -201,15 +208,26 @@ const syncChipToState = () => {
 
 const initializeEnabledState = () => {
   chrome.storage.sync.get(
-    [ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY, GUTENBERG_ENABLED_KEY],
+    [ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY, GUTENBERG_ENABLED_KEY, ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY],
     (result) => {
       const zlibStored = result[ZLIB_ENABLED_KEY]
       const annaStored = result[ANNA_ENABLED_KEY]
       const gutenbergStored = result[GUTENBERG_ENABLED_KEY]
+      const domainStored = result[ZLIB_DOMAIN_KEY]
+      const annaDomainStored = result[ANNA_DOMAIN_KEY]
+
       enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
       enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
       enabledBySource.gutenberg =
         typeof gutenbergStored === "boolean" ? gutenbergStored : true
+
+      if (domainStored) {
+        currentZlibDomain = domainStored
+      }
+      if (annaDomainStored) {
+        currentAnnaDomain = annaDomainStored
+      }
+
       syncChipToState()
     }
   )
@@ -235,6 +253,14 @@ observer.observe(document.body, { childList: true, subtree: true })
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "sync") return
+
+  if (ZLIB_DOMAIN_KEY in changes) {
+    currentZlibDomain = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_DOMAIN
+  }
+  if (ANNA_DOMAIN_KEY in changes) {
+    currentAnnaDomain = changes[ANNA_DOMAIN_KEY].newValue || DEFAULT_ANNA_DOMAIN
+  }
+
   if (ZLIB_ENABLED_KEY in changes) {
     const zlibNext = changes[ZLIB_ENABLED_KEY].newValue
     enabledBySource.zlib = typeof zlibNext === "boolean" ? zlibNext : true
