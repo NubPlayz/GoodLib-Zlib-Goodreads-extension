@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 
-**Open any Goodreads book on Anna's Archive, Z-Library, or Gutenberg in one click.**
+**Open any Goodreads or Hardcover book on Anna's Archive, Z-Library, or Gutenberg in one click.**
 
-GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads book pages. No more copying titles and searching manually 
+GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads and Hardcover book pages. No more copying titles and searching manually 
 
 Learn more on [Offical site](https://goodlib.vercel.app)
 
@@ -22,11 +22,11 @@ Learn more on [Offical site](https://goodlib.vercel.app)
 
 
 
-- **One-click access** : badges appear directly on Goodreads book pages, linking straight to the searched result
+- **One-click access** : badges appear directly on Goodreads and Hardcover book pages, linking straight to the searched result
 - **No more copying titles and searching manually** 
 - **Toggleable sources** : enable or disable individual sources from the popup (e.g. only show Z-Lib and Anna's, hide Gutenberg)
 - **Animated UI** : powered by Anime.js v4
-- **Zero data collection** : the extension only activates on `goodreads.com/book/*`, collects nothing, and stores only your source toggle preferences locally
+- **Zero data collection** : the extension only activates on supported book pages, collects nothing, and stores only your source toggle preferences locally
 - **Cross-browser** : works on Chrome (MV3) and Firefox (MV3)
 
 
@@ -107,7 +107,10 @@ Then load `build/chrome-mv3-dev` as an unpacked extension in Chrome, or the equi
 
 ## Privacy
 
-GoodLib requests only one host permission: `https://www.goodreads.com/book/*`.
+GoodLib requests host permissions only for supported book pages:
+
+- `https://www.goodreads.com/book/*`
+- `https://hardcover.app/books/*`
 
 - No user data is collected or transmitted
 - Source toggle preferences are stored locally via the `storage` permission
@@ -135,7 +138,7 @@ Users are solely responsible for:
 - Understanding and accepting the terms of any sources they configure
 - Use of this tool is entirely at your own risk.
  
-Not affiliated with Goodreads, Z-Library, Anna's Archive, or Project Gutenberg.
+Not affiliated with Goodreads, Hardcover, Z-Library, Anna's Archive, or Project Gutenberg.
  
 
 ## License

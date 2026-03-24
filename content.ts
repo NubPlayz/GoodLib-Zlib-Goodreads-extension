@@ -1,7 +1,7 @@
 import "./content.css"
 
 export const config = {
-  matches: ["https://www.goodreads.com/book/*"]
+  matches: ["https://www.goodreads.com/book/*", "https://hardcover.app/books/*"]
 }
 
 const CHIP_ATTR = "data-goodlib-zlib-chip"
@@ -10,14 +10,15 @@ const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
+const HARDCOVER_HOST = "hardcover.app"
 
-const titleSelectors = [
+const goodreadsTitleSelectors = [
   "h1[data-testid='bookTitle']",
   "h1.Text__title1",
   "h1"
 ]
 
-const authorSelectors = [
+const goodreadsAuthorSelectors = [
   "a[data-testid='name']",
   "[data-testid='authorName']",
   ".ContributorLinksList a.ContributorLink",
@@ -25,8 +26,35 @@ const authorSelectors = [
   "span.ContributorLink__name"
 ]
 
+const hardcoverTitleSelectors = ["main h1", "h1"]
+
+const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
+
+const getHardcoverTitle = (): HTMLElement | null => {
+  for (const selector of hardcoverTitleSelectors) {
+    const nodes = document.querySelectorAll(selector)
+    for (let index = 0; index < nodes.length; index += 1) {
+      const node = nodes[index]
+      if (!(node instanceof HTMLElement)) continue
+      const text = normalizeText(node.innerText)
+      if (text.length === 0) continue
+
+      const authorLink = node.parentElement?.querySelector('a[href^="/authors/"]')
+      if (authorLink instanceof HTMLElement) {
+        return node
+      }
+    }
+  }
+
+  return null
+}
+
 const getBookTitle = (): HTMLElement | null => {
-  for (const selector of titleSelectors) {
+  if (isHardcoverPage()) {
+    return getHardcoverTitle()
+  }
+
+  for (const selector of goodreadsTitleSelectors) {
     const node = document.querySelector(selector)
     if (node instanceof HTMLElement && node.innerText.trim().length > 0) {
       return node
@@ -49,7 +77,23 @@ const getCleanBookTitle = (title: HTMLElement): string => {
 }
 
 const getPrimaryAuthor = (): string => {
-  for (const selector of authorSelectors) {
+  if (isHardcoverPage()) {
+    const title = getBookTitle()
+    const titleBlock = title?.parentElement
+    if (titleBlock) {
+      const authorLinks = titleBlock.querySelectorAll('a[href^="/authors/"]')
+      for (let index = 0; index < authorLinks.length; index += 1) {
+        const node = authorLinks[index]
+        if (!(node instanceof HTMLElement)) continue
+        const text = normalizeText(node.innerText)
+        if (text.length > 0) {
+          return text
+        }
+      }
+    }
+  }
+
+  for (const selector of goodreadsAuthorSelectors) {
     const node = document.querySelector(selector)
     if (!(node instanceof HTMLElement)) continue
     const text = normalizeText(node.innerText)
