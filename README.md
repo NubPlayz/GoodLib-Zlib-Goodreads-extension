@@ -1,7 +1,7 @@
 # <img width="128" height="128" alt="icon_128x128" src="https://github.com/user-attachments/assets/8e9dac2d-286b-4554-8a1a-423440989714" /> GoodLib
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=googlechrome)](YOUR_CWS_LINK)
-[![Firefox Add-ons](https://img.shields.io/badge/Firefox-Add--ons-orange?logo=firefox)](YOUR_AMO_LINK)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=googlechrome)](https://chromewebstore.google.com/detail/goodlib-zlib-annas-archiv/aiampblkjnmfogckjfiecodcnenleehp?authuser=0&hl=en)
+[![Firefox Add-ons](https://img.shields.io/badge/Firefox-Add--ons-orange?logo=firefox)](https://addons.mozilla.org/en-US/firefox/addon/goodlib-zlib-anna-s-archive/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 
@@ -43,6 +43,12 @@ https://github.com/user-attachments/assets/04edaabf-a3df-471f-8cd1-5a308f5572c8
 --
 
 ![mobile promo 2](https://github.com/user-attachments/assets/488e36fb-a881-4e04-a447-2cf861a28367)
+
+##  Mobile demo 
+
+https://github.com/user-attachments/assets/7f2a5aa0-b6c8-4a2d-be4d-8d6b4daaefb1
+
+
 
 
 
