@@ -1,7 +1,12 @@
 import "./content.css"
 
 export const config = {
-  matches: ["https://www.goodreads.com/book/*", "https://hardcover.app/*"]
+  matches: [
+    "https://www.goodreads.com/book/*",
+    "https://hardcover.app/*",
+    "https://app.thestorygraph.com/*",
+    "https://www.thestorygraph.com/*"
+  ]
 }
 
 const CHIP_ATTR = "data-goodlib-zlib-chip"
@@ -11,6 +16,8 @@ const ANNA_ENABLED_KEY = "annaEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 const HARDCOVER_HOST = "hardcover.app"
+const GOODREADS_HOST = "goodreads.com"
+const STORYGRAPH_HOST = "thestorygraph.com"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-library.gs"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -31,8 +38,14 @@ const goodreadsAuthorSelectors = [
 ]
 
 const hardcoverTitleSelectors = ["main h1", "h1"]
+const storyGraphTitleSelectors = [".book-title-author-and-series h3", "h3.font-semibold.text-2xl", "h3"]
+const storyGraphAuthorSelectors = [".book-title-author-and-series a[href^='/authors/']", "a[href^='/authors/']"]
 
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
+const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
+const isStoryGraphPage = () =>
+  window.location.hostname.endsWith(STORYGRAPH_HOST) &&
+  window.location.pathname.includes("/books/")
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -58,7 +71,15 @@ const getBookTitle = (): HTMLElement | null => {
     return getHardcoverTitle()
   }
 
-  for (const selector of goodreadsTitleSelectors) {
+  const selectors = isStoryGraphPage()
+    ? storyGraphTitleSelectors
+    : isGoodreadsPage()
+      ? goodreadsTitleSelectors
+      : null
+
+  if (!selectors) return null
+
+  for (const selector of selectors) {
     const node = document.querySelector(selector)
     if (node instanceof HTMLElement && node.innerText.trim().length > 0) {
       return node
@@ -97,7 +118,15 @@ const getPrimaryAuthor = (): string => {
     }
   }
 
-  for (const selector of goodreadsAuthorSelectors) {
+  const selectors = isStoryGraphPage()
+    ? storyGraphAuthorSelectors
+    : isGoodreadsPage()
+      ? goodreadsAuthorSelectors
+      : null
+
+  if (!selectors) return ""
+
+  for (const selector of selectors) {
     const node = document.querySelector(selector)
     if (!(node instanceof HTMLElement)) continue
     const text = normalizeText(node.innerText)
@@ -176,7 +205,6 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
 }
 
 const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
-  debugger
   const title = getBookTitle()
   if (!title) return
 
@@ -281,8 +309,9 @@ const initializeEnabledState = () => {
 initializeEnabledState()
 
 let injectTimeout: ReturnType<typeof setTimeout> | null = null
+let lastUrl = window.location.href
 
-const observer = new MutationObserver(() => {
+const handleDomChange = () => {
   if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) return
 
   if (injectTimeout) {
@@ -290,11 +319,23 @@ const observer = new MutationObserver(() => {
   }
 
   injectTimeout = setTimeout(() => {
+    if (lastUrl !== window.location.href) {
+      lastUrl = window.location.href
+      removeChip()
+    }
     injectChips(enabledBySource)
   }, 120)
-})
+}
+
+const observer = new MutationObserver(handleDomChange)
 
 observer.observe(document.body, { childList: true, subtree: true })
+
+setInterval(() => {
+  if (lastUrl !== window.location.href) {
+    handleDomChange()
+  }
+}, 500)
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "sync") return
