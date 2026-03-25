@@ -5,7 +5,8 @@ export const config = {
     "https://www.goodreads.com/book/*",
     "https://hardcover.app/*",
     "https://app.thestorygraph.com/*",
-    "https://www.thestorygraph.com/*"
+    "https://www.thestorygraph.com/*",
+    "https://www.babelio.com/livres/*"
   ]
 }
 
@@ -18,8 +19,9 @@ const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 const HARDCOVER_HOST = "hardcover.app"
 const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
+const BABELIO_HOST = "babelio.com"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-library.gs"
+const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
 const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
 
@@ -41,11 +43,17 @@ const hardcoverTitleSelectors = ["main h1", "h1"]
 const storyGraphTitleSelectors = [".book-title-author-and-series h3", "h3.font-semibold.text-2xl", "h3"]
 const storyGraphAuthorSelectors = [".book-title-author-and-series a[href^='/authors/']", "a[href^='/authors/']"]
 
+const babelioTitleSelectors = ["h1[itemprop='name']", "h1"]
+const babelioAuthorSelectors = ["span[itemprop='author'] [itemprop='name']", "a[href^='/auteur/']", ".author", "[itemprop='author']"]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
   window.location.hostname.endsWith(STORYGRAPH_HOST) &&
   window.location.pathname.includes("/books/")
+const isBabelioPage = () =>
+  window.location.hostname.endsWith(BABELIO_HOST) &&
+  window.location.pathname.includes("/livres/")
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -75,7 +83,9 @@ const getBookTitle = (): HTMLElement | null => {
     ? storyGraphTitleSelectors
     : isGoodreadsPage()
       ? goodreadsTitleSelectors
-      : null
+      : isBabelioPage()
+        ? babelioTitleSelectors
+        : null
 
   if (!selectors) return null
 
@@ -122,7 +132,9 @@ const getPrimaryAuthor = (): string => {
     ? storyGraphAuthorSelectors
     : isGoodreadsPage()
       ? goodreadsAuthorSelectors
-      : null
+      : isBabelioPage()
+        ? babelioAuthorSelectors
+        : null
 
   if (!selectors) return ""
 
