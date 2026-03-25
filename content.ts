@@ -6,7 +6,8 @@ export const config = {
     "https://hardcover.app/*",
     "https://app.thestorygraph.com/*",
     "https://www.thestorygraph.com/*",
-    "https://www.babelio.com/livres/*"
+    "https://www.babelio.com/livres/*",
+    "https://www.novelupdates.com/series/*"
   ]
 }
 
@@ -20,6 +21,7 @@ const HARDCOVER_HOST = "hardcover.app"
 const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
+const NOVELUPDATES_HOST = "novelupdates.com"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -46,6 +48,9 @@ const storyGraphAuthorSelectors = [".book-title-author-and-series a[href^='/auth
 const babelioTitleSelectors = ["h1[itemprop='name']", "h1"]
 const babelioAuthorSelectors = ["span[itemprop='author'] [itemprop='name']", "a[href^='/auteur/']", ".author", "[itemprop='author']"]
 
+const novelUpdatesTitleSelectors = [".seriestitlenu", ".seriestitle", "div.seriestitlenu", ".series-title"]
+const novelUpdatesAuthorSelectors = ["a[id='authtag']", "#authtag", "a[href*='/nauthor/']", ".author"]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -54,6 +59,9 @@ const isStoryGraphPage = () =>
 const isBabelioPage = () =>
   window.location.hostname.endsWith(BABELIO_HOST) &&
   window.location.pathname.includes("/livres/")
+const isNovelUpdatesPage = () =>
+  window.location.hostname.endsWith(NOVELUPDATES_HOST) &&
+  window.location.pathname.includes("/series/")
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -85,7 +93,9 @@ const getBookTitle = (): HTMLElement | null => {
       ? goodreadsTitleSelectors
       : isBabelioPage()
         ? babelioTitleSelectors
-        : null
+        : isNovelUpdatesPage()
+          ? novelUpdatesTitleSelectors
+          : null
 
   if (!selectors) return null
 
@@ -134,7 +144,9 @@ const getPrimaryAuthor = (): string => {
       ? goodreadsAuthorSelectors
       : isBabelioPage()
         ? babelioAuthorSelectors
-        : null
+        : isNovelUpdatesPage()
+          ? novelUpdatesAuthorSelectors
+          : null
 
   if (!selectors) return ""
 
