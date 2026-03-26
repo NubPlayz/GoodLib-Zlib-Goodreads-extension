@@ -42,7 +42,14 @@ const goodreadsAuthorSelectors = [
 ]
 
 const hardcoverTitleSelectors = ["main h1", "h1"]
-const storyGraphTitleSelectors = [".book-title-author-and-series h3", "h3.font-semibold.text-2xl", "h3"]
+const storyGraphTitleSelectors = [
+  ".book-title-author-and-series h3",
+  "[data-testid='book-title']",
+  "h3.font-semibold.text-2xl",
+  "h3.font-semibold",
+  "h3.font-bold",
+  "h3"
+]
 const storyGraphAuthorSelectors = [".book-title-author-and-series a[href^='/authors/']", "a[href^='/authors/']"]
 
 const babelioTitleSelectors = ["h1[itemprop='name']", "h1"]
@@ -69,7 +76,7 @@ const getHardcoverTitle = (): HTMLElement | null => {
     for (let index = 0; index < nodes.length; index += 1) {
       const node = nodes[index]
       if (!(node instanceof HTMLElement)) continue
-      const text = normalizeText(node.innerText)
+      const text = normalizeText(node.textContent ?? "")
       if (text.length === 0) continue
 
       const authorLink = node.parentElement?.querySelector('a[href^="/authors/"]')
@@ -100,8 +107,12 @@ const getBookTitle = (): HTMLElement | null => {
   if (!selectors) return null
 
   for (const selector of selectors) {
-    const node = document.querySelector(selector)
-    if (node instanceof HTMLElement && node.innerText.trim().length > 0) {
+    const nodes = document.querySelectorAll(selector)
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
+      if (!(node instanceof HTMLElement)) continue
+      if ((node.textContent ?? "").trim().length === 0) continue
+      if (node.offsetParent === null && node.tagName !== "BODY") continue
       return node
     }
   }
@@ -130,7 +141,7 @@ const getPrimaryAuthor = (): string => {
       for (let index = 0; index < authorLinks.length; index += 1) {
         const node = authorLinks[index]
         if (!(node instanceof HTMLElement)) continue
-        const text = normalizeText(node.innerText)
+        const text = normalizeText(node.textContent ?? "")
         if (text.length > 0) {
           return text
         }
@@ -153,7 +164,7 @@ const getPrimaryAuthor = (): string => {
   for (const selector of selectors) {
     const node = document.querySelector(selector)
     if (!(node instanceof HTMLElement)) continue
-    const text = normalizeText(node.innerText)
+    const text = normalizeText(node.textContent ?? "")
     if (text.length > 0) {
       return text
     }
@@ -336,6 +347,7 @@ let injectTimeout: ReturnType<typeof setTimeout> | null = null
 let lastUrl = window.location.href
 
 const handleDomChange = () => {
+  debugger
   if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) return
 
   if (injectTimeout) {
