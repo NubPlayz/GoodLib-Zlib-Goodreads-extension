@@ -2,16 +2,15 @@ import { animate } from "animejs"
 
 import "./popup.css"
 import mascotCat from "./mascot cat.png"
-
-const ZLIB_ENABLED_KEY = "zlibEnabled"
-const ANNA_ENABLED_KEY = "annaEnabled"
-const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
-const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-library.gs"
-const ANNA_DOMAIN_KEY = "annaDomain"
-const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
-
-type SourceKey = "zlib" | "anna" | "gutenberg"
+import {
+  ANNA_DOMAIN_KEY,
+  DEFAULT_ANNA_DOMAIN,
+  DEFAULT_ZLIB_DOMAIN,
+  ZLIB_DOMAIN_KEY,
+  sourceConfigByKey,
+  sourceKeys
+} from "./sources"
+import type { SourceKey } from "./sources"
 
 type SourceConfig = {
   avatarClassName?: string
@@ -32,20 +31,20 @@ type SourceElements = {
 const sourceConfig: Record<SourceKey, SourceConfig> = {
   zlib: {
     avatarText: "Z",
-    label: "Z-Lib",
+    label: sourceConfigByKey.zlib.label,
     rowClassName: "anime-row-zlib",
-    storageKey: ZLIB_ENABLED_KEY,
-    subtitle: "z-lib.gl",
+    storageKey: sourceConfigByKey.zlib.enabledStorageKey,
+    subtitle: DEFAULT_ZLIB_DOMAIN,
     tagClassName: "anime-tag-zlib",
     trackClassName: "zlib-switch"
   },
   anna: {
     avatarClassName: "popup-avatar--anna",
     avatarText: "A",
-    label: "Anna's",
+    label: sourceConfigByKey.anna.label,
     rowClassName: "anime-row-anna",
-    storageKey: ANNA_ENABLED_KEY,
-    subtitle: "annas-archive.gd",
+    storageKey: sourceConfigByKey.anna.enabledStorageKey,
+    subtitle: DEFAULT_ANNA_DOMAIN,
     tagClassName: "anime-tag-anna",
     trackClassName: "anna-switch"
   },
@@ -54,14 +53,12 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     avatarText: "PG",
     label: "Project Gutenberg",
     rowClassName: "anime-row-gutenberg",
-    storageKey: GUTENBERG_ENABLED_KEY,
+    storageKey: sourceConfigByKey.gutenberg.enabledStorageKey,
     subtitle: "gutenberg.org",
     tagClassName: "anime-tag-gutenberg",
     trackClassName: "gutenberg-switch"
   }
 }
-
-const sourceKeys: SourceKey[] = ["zlib", "anna", "gutenberg"]
 
 const sourceElements = {} as Record<SourceKey, SourceElements>
 
@@ -185,7 +182,7 @@ const syncFromStorage = () => {
 
       const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
       if (zlibSubtitle) {
-        zlibSubtitle.textContent = result[ZLIB_DOMAIN_KEY] || DEFAULT_DOMAIN
+        zlibSubtitle.textContent = result[ZLIB_DOMAIN_KEY] || DEFAULT_ZLIB_DOMAIN
       }
 
       const annaSubtitle = sourceElements.anna?.row.querySelector(".popup-subtitle")
@@ -261,7 +258,7 @@ const mountPopup = () => {
     if (ZLIB_DOMAIN_KEY in changes) {
       const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
       if (zlibSubtitle) {
-        zlibSubtitle.textContent = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_DOMAIN
+        zlibSubtitle.textContent = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_ZLIB_DOMAIN
       }
     }
 

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import "./options.css"
-
-const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-library.gs"
-const ANNA_DOMAIN_KEY = "annaDomain"
-const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
+import {
+  ANNA_DOMAIN_KEY,
+  DEFAULT_ANNA_DOMAIN,
+  DEFAULT_ZLIB_DOMAIN,
+  ZLIB_DOMAIN_KEY
+} from "./sources"
 
 const domains = [
   "z-library.gs",
@@ -24,7 +25,7 @@ const annaDomains = [
 ]
 
 function OptionsIndex() {
-  const [selectedDomain, setSelectedDomain] = useState(DEFAULT_DOMAIN)
+  const [selectedDomain, setSelectedDomain] = useState(DEFAULT_ZLIB_DOMAIN)
   const [selectedAnnaDomain, setSelectedAnnaDomain] = useState(DEFAULT_ANNA_DOMAIN)
 
   useEffect(() => {

@@ -1,4 +1,22 @@
 import "./content.css"
+import {
+  CUSTOM_SOURCES_KEY,
+  ANNA_DOMAIN_KEY,
+  DEFAULT_ANNA_DOMAIN,
+  DEFAULT_ZLIB_DOMAIN,
+  SAMPLE_CUSTOM_SOURCES,
+  ZLIB_DOMAIN_KEY,
+  getSourceGlyph,
+  normalizeCustomSources,
+  renderSourceTemplate,
+  sourceConfigByKey,
+  sourceKeys
+} from "./sources"
+import type {
+  SearchTemplateContext,
+  SourceKey,
+  StoredCustomSource
+} from "./sources"
 
 export const config = {
   matches: [
@@ -13,19 +31,15 @@ export const config = {
 
 const CHIP_ATTR = "data-goodlib-zlib-chip"
 const CHIP_CLASS = "goodlib-chip"
-const ZLIB_ENABLED_KEY = "zlibEnabled"
-const ANNA_ENABLED_KEY = "annaEnabled"
-const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
+const SEARCH_AUTHOR_ATTR = "data-search-author"
+const SEARCH_QUERY_ATTR = "data-search-query"
+const SEARCH_TITLE_ATTR = "data-search-title"
 const HARDCOVER_HOST = "hardcover.app"
 const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
-const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-lib.sk"
-const ANNA_DOMAIN_KEY = "annaDomain"
-const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
 
 const goodreadsTitleSelectors = [
   "h1[data-testid='bookTitle']",
@@ -186,16 +200,16 @@ const removeChip = () => {
   }
 }
 
-type SourceKey = "zlib" | "anna" | "gutenberg"
-
-const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
-  zlib: { label: "Z-Lib", glyph: "z" },
-  anna: { label: "Anna's", glyph: "A" },
-  gutenberg: { label: "Gutenberg", glyph: "PG" }
+type RuntimeSource = {
+  buildUrl: (context: SearchTemplateContext) => string
+  chipGlyph: string
+  id: string
+  label: string
 }
 
-let currentZlibDomain = DEFAULT_DOMAIN
+let currentZlibDomain = DEFAULT_ZLIB_DOMAIN
 let currentAnnaDomain = DEFAULT_ANNA_DOMAIN
+let customSources: StoredCustomSource[] = []
 
 const buildSourceUrl = (source: SourceKey, query: string) => {
   const encoded = encodeURIComponent(query)
@@ -209,12 +223,47 @@ const buildSourceUrl = (source: SourceKey, query: string) => {
   return `https://${currentZlibDomain}/s/${encoded}`
 }
 
-const makeChip = (source: SourceKey, searchQuery: string) => {
+const getActiveSources = (): RuntimeSource[] => {
+  const builtInSources = sourceKeys
+    .filter((source) => enabledBySource[source])
+    .map((source) => ({
+      buildUrl: ({ query }: SearchTemplateContext) => buildSourceUrl(source, query),
+      chipGlyph: sourceConfigByKey[source].chipGlyph,
+      id: source,
+      label: sourceConfigByKey[source].label
+    }))
+
+  const customRuntimeSources = customSources
+    .filter((source) => source.enabled)
+    .map((source) => ({
+      buildUrl: (context: SearchTemplateContext) =>
+        renderSourceTemplate(source.template, context),
+      chipGlyph: getSourceGlyph(source.label),
+      id: source.id,
+      label: source.label
+    }))
+
+  return [...builtInSources, ...customRuntimeSources]
+}
+
+const applySearchContext = (chip: HTMLElement, context: SearchTemplateContext) => {
+  chip.setAttribute(SEARCH_QUERY_ATTR, context.query)
+  chip.setAttribute(SEARCH_TITLE_ATTR, context.title)
+  chip.setAttribute(SEARCH_AUTHOR_ATTR, context.author)
+}
+
+const readSearchContext = (chip: HTMLElement): SearchTemplateContext => ({
+  author: chip.getAttribute(SEARCH_AUTHOR_ATTR) ?? "",
+  query: chip.getAttribute(SEARCH_QUERY_ATTR) ?? "",
+  title: chip.getAttribute(SEARCH_TITLE_ATTR) ?? ""
+})
+
+const makeChip = (source: RuntimeSource, context: SearchTemplateContext) => {
   const chip = document.createElement("span")
-  chip.setAttribute(CHIP_ATTR, source)
-  chip.className = `${CHIP_CLASS} ${CHIP_CLASS}--${source}`
-  chip.setAttribute("data-search-query", searchQuery)
-  const glyph = sourceMeta[source].glyph
+  chip.setAttribute(CHIP_ATTR, source.id)
+  chip.className = `${CHIP_CLASS} ${CHIP_CLASS}--${source.id}`
+  applySearchContext(chip, context)
+  const glyph = source.chipGlyph
   const glyphClass =
     glyph.length > 1 ? "goodlib-chip-glyph goodlib-chip-glyph--wide" : "goodlib-chip-glyph"
 
@@ -228,18 +277,17 @@ const makeChip = (source: SourceKey, searchQuery: string) => {
 
   const label = document.createElement("span")
   label.className = "goodlib-chip-label"
-  label.textContent = sourceMeta[source].label
+  label.textContent = source.label
 
   chip.replaceChildren(icon, label)
   chip.addEventListener("click", () => {
-    const query = chip.getAttribute("data-search-query") ?? searchQuery
-    window.open(buildSourceUrl(source, query), "_blank", "noopener,noreferrer")
+    window.open(source.buildUrl(readSearchContext(chip)), "_blank", "noopener,noreferrer")
   })
 
   return chip
 }
 
-const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
+const injectChips = (sources: RuntimeSource[]) => {
   const title = getBookTitle()
   if (!title) return
 
@@ -247,7 +295,11 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
   if (!bookTitle) return
 
   const primaryAuthor = getPrimaryAuthor()
-  const searchQuery = buildSearchQuery(bookTitle, primaryAuthor)
+  const searchContext: SearchTemplateContext = {
+    author: primaryAuthor,
+    query: buildSearchQuery(bookTitle, primaryAuthor),
+    title: bookTitle
+  }
 
   let wrap = title.querySelector(`[${CHIPS_WRAP_ATTR}]`)
   if (!(wrap instanceof HTMLElement)) {
@@ -259,31 +311,14 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
 
   const orderedChips: HTMLElement[] = []
 
-  let zlibChip = wrap.querySelector(`[${CHIP_ATTR}="zlib"]`)
-  if (!(zlibChip instanceof HTMLElement) && enabledBySource.zlib) {
-    zlibChip = makeChip("zlib", searchQuery)
-  }
-  if (zlibChip instanceof HTMLElement && enabledBySource.zlib) {
-    zlibChip.setAttribute("data-search-query", searchQuery)
-    orderedChips.push(zlibChip)
-  }
+  for (const source of sources) {
+    let chip = wrap.querySelector(`[${CHIP_ATTR}="${source.id}"]`)
+    if (!(chip instanceof HTMLElement)) {
+      chip = makeChip(source, searchContext)
+    }
 
-  let annaChip = wrap.querySelector(`[${CHIP_ATTR}="anna"]`)
-  if (!(annaChip instanceof HTMLElement) && enabledBySource.anna) {
-    annaChip = makeChip("anna", searchQuery)
-  }
-  if (annaChip instanceof HTMLElement && enabledBySource.anna) {
-    annaChip.setAttribute("data-search-query", searchQuery)
-    orderedChips.push(annaChip)
-  }
-
-  let gutenbergChip = wrap.querySelector(`[${CHIP_ATTR}="gutenberg"]`)
-  if (!(gutenbergChip instanceof HTMLElement) && enabledBySource.gutenberg) {
-    gutenbergChip = makeChip("gutenberg", searchQuery)
-  }
-  if (gutenbergChip instanceof HTMLElement && enabledBySource.gutenberg) {
-    gutenbergChip.setAttribute("data-search-query", searchQuery)
-    orderedChips.push(gutenbergChip)
+    applySearchContext(chip as HTMLElement, searchContext)
+    orderedChips.push(chip as HTMLElement)
   }
 
   const currentOrder = Array.from(wrap.children).filter(
@@ -299,41 +334,44 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
   }
 }
 
-const enabledBySource: Record<SourceKey, boolean> = {
-  zlib: true,
-  anna: true,
-  gutenberg: true
-}
+const enabledBySource = Object.fromEntries(sourceKeys.map((source) => [source, true])) as Record<
+  SourceKey,
+  boolean
+>
 
 const syncChipToState = () => {
-  if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) {
+  const activeSources = getActiveSources()
+  if (activeSources.length === 0) {
     removeChip()
     return
   }
 
-  injectChips(enabledBySource)
+  injectChips(activeSources)
 }
 
 const initializeEnabledState = () => {
   chrome.storage.sync.get(
-    [ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY, GUTENBERG_ENABLED_KEY, ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY],
+    [
+      ...sourceKeys.map((source) => sourceConfigByKey[source].enabledStorageKey),
+      ZLIB_DOMAIN_KEY,
+      ANNA_DOMAIN_KEY,
+      CUSTOM_SOURCES_KEY
+    ],
     (result) => {
-      const zlibStored = result[ZLIB_ENABLED_KEY]
-      const annaStored = result[ANNA_ENABLED_KEY]
-      const gutenbergStored = result[GUTENBERG_ENABLED_KEY]
-      const domainStored = result[ZLIB_DOMAIN_KEY]
-      const annaDomainStored = result[ANNA_DOMAIN_KEY]
-
-      enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
-      enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
-      enabledBySource.gutenberg =
-        typeof gutenbergStored === "boolean" ? gutenbergStored : true
-
-      if (domainStored) {
-        currentZlibDomain = domainStored
+      for (const source of sourceKeys) {
+        const storedValue = result[sourceConfigByKey[source].enabledStorageKey]
+        enabledBySource[source] = typeof storedValue === "boolean" ? storedValue : true
       }
-      if (annaDomainStored) {
-        currentAnnaDomain = annaDomainStored
+
+      if (result[ZLIB_DOMAIN_KEY]) {
+        currentZlibDomain = result[ZLIB_DOMAIN_KEY]
+      }
+      if (result[ANNA_DOMAIN_KEY]) {
+        currentAnnaDomain = result[ANNA_DOMAIN_KEY]
+      }
+      customSources = normalizeCustomSources(result[CUSTOM_SOURCES_KEY])
+      if (customSources.length === 0) {
+        customSources = SAMPLE_CUSTOM_SOURCES
       }
 
       syncChipToState()
@@ -347,8 +385,7 @@ let injectTimeout: ReturnType<typeof setTimeout> | null = null
 let lastUrl = window.location.href
 
 const handleDomChange = () => {
-  debugger
-  if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) return
+  if (getActiveSources().length === 0) return
 
   if (injectTimeout) {
     clearTimeout(injectTimeout)
@@ -359,7 +396,7 @@ const handleDomChange = () => {
       lastUrl = window.location.href
       removeChip()
     }
-    injectChips(enabledBySource)
+    injectChips(getActiveSources())
   }, 120)
 }
 
@@ -377,24 +414,23 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "sync") return
 
   if (ZLIB_DOMAIN_KEY in changes) {
-    currentZlibDomain = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_DOMAIN
+    currentZlibDomain = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_ZLIB_DOMAIN
   }
   if (ANNA_DOMAIN_KEY in changes) {
     currentAnnaDomain = changes[ANNA_DOMAIN_KEY].newValue || DEFAULT_ANNA_DOMAIN
   }
+  if (CUSTOM_SOURCES_KEY in changes) {
+    customSources = normalizeCustomSources(changes[CUSTOM_SOURCES_KEY].newValue)
+    if (customSources.length === 0) {
+      customSources = SAMPLE_CUSTOM_SOURCES
+    }
+  }
 
-  if (ZLIB_ENABLED_KEY in changes) {
-    const zlibNext = changes[ZLIB_ENABLED_KEY].newValue
-    enabledBySource.zlib = typeof zlibNext === "boolean" ? zlibNext : true
-  }
-  if (ANNA_ENABLED_KEY in changes) {
-    const annaNext = changes[ANNA_ENABLED_KEY].newValue
-    enabledBySource.anna = typeof annaNext === "boolean" ? annaNext : true
-  }
-  if (GUTENBERG_ENABLED_KEY in changes) {
-    const gutenbergNext = changes[GUTENBERG_ENABLED_KEY].newValue
-    enabledBySource.gutenberg =
-      typeof gutenbergNext === "boolean" ? gutenbergNext : true
+  for (const source of sourceKeys) {
+    const change = changes[sourceConfigByKey[source].enabledStorageKey]
+    if (!change) continue
+
+    enabledBySource[source] = typeof change.newValue === "boolean" ? change.newValue : true
   }
   syncChipToState()
 })
