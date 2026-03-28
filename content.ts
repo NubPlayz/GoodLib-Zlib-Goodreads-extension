@@ -3,8 +3,8 @@ import {
   CUSTOM_SOURCES_KEY,
   ANNA_DOMAIN_KEY,
   DEFAULT_ANNA_DOMAIN,
+  ensureDefaultCustomSourcesInStorage,
   DEFAULT_ZLIB_DOMAIN,
-  SAMPLE_CUSTOM_SOURCES,
   ZLIB_DOMAIN_KEY,
   getSourceGlyph,
   normalizeCustomSources,
@@ -370,16 +370,16 @@ const initializeEnabledState = () => {
         currentAnnaDomain = result[ANNA_DOMAIN_KEY]
       }
       customSources = normalizeCustomSources(result[CUSTOM_SOURCES_KEY])
-      if (customSources.length === 0) {
-        customSources = SAMPLE_CUSTOM_SOURCES
-      }
-
       syncChipToState()
     }
   )
 }
 
 initializeEnabledState()
+ensureDefaultCustomSourcesInStorage().then((storedSources) => {
+  customSources = storedSources
+  syncChipToState()
+})
 
 let injectTimeout: ReturnType<typeof setTimeout> | null = null
 let lastUrl = window.location.href
@@ -421,9 +421,6 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
   if (CUSTOM_SOURCES_KEY in changes) {
     customSources = normalizeCustomSources(changes[CUSTOM_SOURCES_KEY].newValue)
-    if (customSources.length === 0) {
-      customSources = SAMPLE_CUSTOM_SOURCES
-    }
   }
 
   for (const source of sourceKeys) {
