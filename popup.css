@@ -194,8 +194,54 @@
   background: #f59e0b;
 }
 
+.popup-toggle input:checked+.popup-toggle-track.custom-switch {
+  background: #8b5cf6;
+}
+
 .popup-toggle input:checked+.popup-toggle-track::before {
   transform: translateX(22px);
+}
+
+.popup-avatar--custom {
+  background: #8b5cf6;
+  font-size: 12px;
+}
+
+.popup-row--custom-empty .popup-name {
+  color: #475569;
+}
+
+.popup-row--custom-empty .popup-subtitle {
+  color: #94a3b8;
+}
+
+.popup-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.popup-mini-btn {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid #d5def1;
+  background: #f8fbff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.popup-mini-btn:hover {
+  background: #eef5ff;
+  border-color: #bfd2f6;
+  transform: translateY(-1px);
 }
 
 .popup-footer {

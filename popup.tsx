@@ -4,13 +4,17 @@ import "./popup.css"
 import mascotCat from "./mascot cat.png"
 import {
   ANNA_DOMAIN_KEY,
+  CUSTOM_SOURCES_KEY,
+  CUSTOM_SOURCE_IDS,
   DEFAULT_ANNA_DOMAIN,
   DEFAULT_ZLIB_DOMAIN,
   ZLIB_DOMAIN_KEY,
   sourceConfigByKey,
-  sourceKeys
+  sourceKeys,
+  toCustomSourceSlots,
+  writeCustomSourcesToStorage
 } from "./sources"
-import type { SourceKey } from "./sources"
+import type { CustomSourceId, CustomSourceSlot, SourceKey } from "./sources"
 
 type SourceConfig = {
   avatarClassName?: string
@@ -26,6 +30,13 @@ type SourceConfig = {
 type SourceElements = {
   input: HTMLInputElement
   row: HTMLDivElement
+}
+
+type CustomSourceElements = {
+  input: HTMLInputElement
+  name: HTMLDivElement
+  row: HTMLDivElement
+  subtitle: HTMLDivElement
 }
 
 const sourceConfig: Record<SourceKey, SourceConfig> = {
@@ -61,6 +72,8 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
 }
 
 const sourceElements = {} as Record<SourceKey, SourceElements>
+const customSourceElements = {} as Record<CustomSourceId, CustomSourceElements>
+let customSourceSlots: CustomSourceSlot[] = CUSTOM_SOURCE_IDS.map(() => null)
 
 const createElement = <K extends keyof HTMLElementTagNameMap>(
   tagName: K,
@@ -77,6 +90,12 @@ const createElement = <K extends keyof HTMLElementTagNameMap>(
   return element
 }
 
+const getCustomSourceIndex = (sourceId: CustomSourceId) =>
+  CUSTOM_SOURCE_IDS.findIndex((value) => value === sourceId)
+
+const getCustomSourceTitle = (sourceId: CustomSourceId) =>
+  sourceId === "custom-1" ? "Custom Link 1" : "Custom Link 2"
+
 const applySourceState = (source: SourceKey, isEnabled: boolean) => {
   const elements = sourceElements[source]
   if (!elements) {
@@ -87,14 +106,32 @@ const applySourceState = (source: SourceKey, isEnabled: boolean) => {
   elements.row.classList.toggle("popup-row--off", !isEnabled)
 }
 
-const runToggleAnimation = (source: SourceKey, isEnabled: boolean) => {
-  animate(`.anime-row-${source}`, {
+const applyCustomSourceState = (sourceId: CustomSourceId) => {
+  const elements = customSourceElements[sourceId]
+  if (!elements) {
+    return
+  }
+
+  const sourceIndex = getCustomSourceIndex(sourceId)
+  const source = customSourceSlots[sourceIndex]
+  const isEnabled = source?.enabled ?? false
+
+  elements.input.checked = isEnabled
+  elements.input.disabled = !source
+  elements.name.textContent = source?.label ?? getCustomSourceTitle(sourceId)
+  elements.subtitle.textContent = source?.template ?? "Edit in settings to configure this link."
+  elements.row.classList.toggle("popup-row--off", !isEnabled)
+  elements.row.classList.toggle("popup-row--custom-empty", !source)
+}
+
+const runToggleAnimation = (rowKey: string, isEnabled: boolean) => {
+  animate(`.anime-row-${rowKey}`, {
     scale: [1, 0.96, 1],
     duration: 400,
     easing: "easeOutBack"
   })
 
-  animate(`.anime-tag-${source}`, {
+  animate(`.anime-tag-${rowKey}`, {
     rotate: isEnabled ? "1turn" : "-1turn",
     scale: isEnabled ? [1, 1.4, 1] : [1, 0.8, 1],
     duration: 800,
@@ -119,6 +156,11 @@ const createActionLink = (label: string, href: string, leadingText?: string) => 
   return link
 }
 
+const openOptionsAndClose = () => {
+  chrome.runtime.openOptionsPage()
+  window.close()
+}
+
 const createSettingsBtn = () => {
   const btn = createElement("button", "popup-action-btn popup-settings-btn")
 
@@ -127,10 +169,7 @@ const createSettingsBtn = () => {
 
   btn.append(icon, createElement("span", undefined, "Settings"))
 
-  btn.addEventListener("click", () => {
-    chrome.runtime.openOptionsPage()
-    window.close()
-  })
+  btn.addEventListener("click", openOptionsAndClose)
 
   return btn
 }
@@ -175,11 +214,67 @@ const createPopupRow = (source: SourceKey) => {
   return row
 }
 
+const createCustomPopupRow = (sourceId: CustomSourceId) => {
+  const row = createElement("div", `popup-row popup-row--custom anime-row-${sourceId}`)
+  const avatar = createElement(
+    "div",
+    `popup-avatar popup-avatar--custom anime-tag-${sourceId}`,
+    sourceId === "custom-1" ? "C1" : "C2"
+  )
+
+  const copy = createElement("div", "popup-copy")
+  const name = createElement("div", "popup-name", getCustomSourceTitle(sourceId))
+  const subtitle = createElement("div", "popup-subtitle", "Edit in settings to configure this link.")
+  copy.append(name, subtitle)
+
+  const actions = createElement("div", "popup-row-actions")
+  const editButton = createElement("button", "popup-mini-btn", "Edit") as HTMLButtonElement
+  editButton.type = "button"
+  editButton.addEventListener("click", openOptionsAndClose)
+
+  const toggle = createElement("label", "popup-toggle")
+  const input = createElement("input") as HTMLInputElement
+  input.type = "checkbox"
+  input.checked = false
+  input.addEventListener("change", () => {
+    const sourceIndex = getCustomSourceIndex(sourceId)
+    const currentSource = customSourceSlots[sourceIndex]
+    if (!currentSource) {
+      input.checked = false
+      openOptionsAndClose()
+      return
+    }
+
+    customSourceSlots[sourceIndex] = {
+      ...currentSource,
+      enabled: input.checked
+    }
+    applyCustomSourceState(sourceId)
+    writeCustomSourcesToStorage(customSourceSlots)
+    runToggleAnimation(sourceId, input.checked)
+  })
+
+  const track = createElement("span", "popup-toggle-track custom-switch")
+  toggle.append(input, track)
+
+  actions.append(editButton, toggle)
+  row.append(avatar, copy, actions)
+
+  customSourceElements[sourceId] = { input, name, row, subtitle }
+  applyCustomSourceState(sourceId)
+
+  return row
+}
+
 const syncFromStorage = () => {
   chrome.storage.sync.get(
-    [...sourceKeys.map((source) => sourceConfig[source].storageKey), ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY],
+    [
+      ...sourceKeys.map((source) => sourceConfig[source].storageKey),
+      ZLIB_DOMAIN_KEY,
+      ANNA_DOMAIN_KEY,
+      CUSTOM_SOURCES_KEY
+    ],
     (result) => {
-
       const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
       if (zlibSubtitle) {
         zlibSubtitle.textContent = result[ZLIB_DOMAIN_KEY] || DEFAULT_ZLIB_DOMAIN
@@ -193,6 +288,11 @@ const syncFromStorage = () => {
       for (const source of sourceKeys) {
         const storedValue = result[sourceConfig[source].storageKey]
         applySourceState(source, typeof storedValue === "boolean" ? storedValue : true)
+      }
+
+      customSourceSlots = toCustomSourceSlots(result[CUSTOM_SOURCES_KEY])
+      for (const sourceId of CUSTOM_SOURCE_IDS) {
+        applyCustomSourceState(sourceId)
       }
     }
   )
@@ -230,6 +330,9 @@ const mountPopup = () => {
   for (const source of sourceKeys) {
     card.appendChild(createPopupRow(source))
   }
+  for (const sourceId of CUSTOM_SOURCE_IDS) {
+    card.appendChild(createCustomPopupRow(sourceId))
+  }
 
   const footer = createElement("div", "popup-footer")
   const helpText = createElement("div", "popup-subtitle popup-footer-help", "Link not working? check settings!")
@@ -266,6 +369,13 @@ const mountPopup = () => {
       const annaSubtitle = sourceElements.anna?.row.querySelector(".popup-subtitle")
       if (annaSubtitle) {
         annaSubtitle.textContent = changes[ANNA_DOMAIN_KEY].newValue || DEFAULT_ANNA_DOMAIN
+      }
+    }
+
+    if (CUSTOM_SOURCES_KEY in changes) {
+      customSourceSlots = toCustomSourceSlots(changes[CUSTOM_SOURCES_KEY].newValue)
+      for (const sourceId of CUSTOM_SOURCE_IDS) {
+        applyCustomSourceState(sourceId)
       }
     }
 

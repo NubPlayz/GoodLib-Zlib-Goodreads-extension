@@ -8,8 +8,10 @@ export const ANNA_DOMAIN_KEY = "annaDomain"
 export const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
 export const CUSTOM_SOURCES_KEY = "customSources"
 export const MAX_CUSTOM_SOURCES = 2
+export const CUSTOM_SOURCE_IDS = ["custom-1", "custom-2"] as const
 
 export type SourceKey = "zlib" | "anna" | "gutenberg"
+export type CustomSourceId = (typeof CUSTOM_SOURCE_IDS)[number]
 export type SearchTemplateContext = {
   author: string
   query: string
@@ -18,12 +20,18 @@ export type SearchTemplateContext = {
 
 export type StoredCustomSource = {
   enabled: boolean
-  id: string
+  id: CustomSourceId
   label: string
   template: string
 }
 
-export const SAMPLE_CUSTOM_SOURCES: StoredCustomSource[] = [
+export type CustomSourceSlot = {
+  enabled: boolean
+  label: string
+  template: string
+} | null
+
+export const DEFAULT_CUSTOM_SOURCES: StoredCustomSource[] = [
   {
     enabled: true,
     id: "custom-1",
@@ -89,11 +97,28 @@ export const normalizeCustomSources = (value: unknown): StoredCustomSource[] => 
     return [
       {
         enabled: typeof enabledValue === "boolean" ? enabledValue : true,
-        id: `custom-${index + 1}`,
+        id: CUSTOM_SOURCE_IDS[index] ?? "custom-1",
         label,
         template
       }
     ]
+  })
+}
+
+export const toCustomSourceSlots = (value: unknown): CustomSourceSlot[] => {
+  const normalizedSources = normalizeCustomSources(value)
+
+  return CUSTOM_SOURCE_IDS.map((sourceId) => {
+    const source = normalizedSources.find((entry) => entry.id === sourceId)
+    if (!source) {
+      return null
+    }
+
+    return {
+      enabled: source.enabled,
+      label: source.label,
+      template: source.template
+    }
   })
 }
 
@@ -129,3 +154,30 @@ export const renderSourceTemplate = (
     template
   )
 }
+
+export const readCustomSourcesFromStorage = () =>
+  new Promise<StoredCustomSource[]>((resolve) => {
+    chrome.storage.sync.get([CUSTOM_SOURCES_KEY], (result) => {
+      resolve(normalizeCustomSources(result[CUSTOM_SOURCES_KEY]))
+    })
+  })
+
+export const writeCustomSourcesToStorage = (sources: CustomSourceSlot[]) =>
+  new Promise<void>((resolve) => {
+    chrome.storage.sync.set({ [CUSTOM_SOURCES_KEY]: sources }, () => resolve())
+  })
+
+export const ensureDefaultCustomSourcesInStorage = () =>
+  new Promise<StoredCustomSource[]>((resolve) => {
+    chrome.storage.sync.get([CUSTOM_SOURCES_KEY], (result) => {
+      const storedSources = normalizeCustomSources(result[CUSTOM_SOURCES_KEY])
+      if (storedSources.length > 0) {
+        resolve(storedSources)
+        return
+      }
+
+      chrome.storage.sync.set({ [CUSTOM_SOURCES_KEY]: DEFAULT_CUSTOM_SOURCES }, () => {
+        resolve(DEFAULT_CUSTOM_SOURCES)
+      })
+    })
+  })
