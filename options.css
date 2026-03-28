@@ -82,6 +82,109 @@ select:focus {
   outline-offset: 2px;
 }
 
+.custom-source-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.custom-source-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.custom-source-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.custom-source-note {
+  font-size: 13px;
+  color: #666;
+}
+
+.custom-source-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+.custom-source-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.custom-source-field span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.custom-source-field input,
+.custom-source-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.custom-source-field textarea {
+  resize: vertical;
+  min-height: 88px;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
+    Menlo, monospace;
+}
+
+.custom-source-field input:focus,
+.custom-source-field textarea:focus {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+.custom-source-actions {
+  margin-top: 24px;
+}
+
+.save-button {
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background: #222;
+}
+
+.custom-source-message {
+  margin: 12px 0 0 0;
+  font-size: 14px;
+  color: #2f5f2f;
+}
+
+.custom-source-message--error {
+  color: #a12626;
+}
+
 .footer {
   margin-top: 80px;
   font-size: 14px;
