@@ -63,6 +63,10 @@
   background: #00d1b2;
 }
 
+.goodlib-chip--audiobookbay .goodlib-chip-icon {
+  background: #d97706;
+}
+
 .goodlib-chip--gutenberg .goodlib-chip-icon {
   background: #ffdd57;
   color: #333333;
