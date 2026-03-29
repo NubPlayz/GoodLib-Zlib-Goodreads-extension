@@ -15,6 +15,7 @@ const CHIP_ATTR = "data-goodlib-zlib-chip"
 const CHIP_CLASS = "goodlib-chip"
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
+const AUDIOBOOKBAY_ENABLED_KEY = "audiobookbayEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 const HARDCOVER_HOST = "hardcover.app"
@@ -26,6 +27,8 @@ const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
 const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
+const AUDIOBOOKBAY_DOMAIN_KEY = "audiobookbayDomain"
+const DEFAULT_AUDIOBOOKBAY_DOMAIN = "https://audiobookbay.lu"
 
 const goodreadsTitleSelectors = [
   "h1[data-testid='bookTitle']",
@@ -186,21 +189,39 @@ const removeChip = () => {
   }
 }
 
-type SourceKey = "zlib" | "anna" | "gutenberg"
+type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg"
 
 const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
   zlib: { label: "Z-Lib", glyph: "z" },
   anna: { label: "Anna's", glyph: "A" },
+  audiobookbay: { label: "AudiobookBay", glyph: "AB" },
   gutenberg: { label: "Gutenberg", glyph: "PG" }
 }
 
 let currentZlibDomain = DEFAULT_DOMAIN
 let currentAnnaDomain = DEFAULT_ANNA_DOMAIN
+let currentAudiobookbayDomain = DEFAULT_AUDIOBOOKBAY_DOMAIN
+
+const normalizeAudiobookbayDomain = (value: string) => {
+  const trimmed = value.trim().replace(/\/+$/, "")
+  if (!trimmed) {
+    return DEFAULT_AUDIOBOOKBAY_DOMAIN
+  }
+
+  return /^https?:\/\//.test(trimmed) ? trimmed : `https://${trimmed}`
+}
 
 const buildSourceUrl = (source: SourceKey, query: string) => {
   const encoded = encodeURIComponent(query)
   if (source === "anna") {
     return `https://${currentAnnaDomain}/search?q=${encoded}`
+  }
+  if (source === "audiobookbay") {
+    const normalizedAudiobookQuery = String(query).toLowerCase()
+    const url = new URL("/", normalizeAudiobookbayDomain(currentAudiobookbayDomain))
+    url.searchParams.set("s", normalizedAudiobookQuery)
+    url.searchParams.set("cat", "undefined,undefined")
+    return url.toString()
   }
   if (source === "gutenberg") {
     return `https://www.gutenberg.org/ebooks/search/?query=${encoded}`
@@ -277,6 +298,15 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
     orderedChips.push(annaChip)
   }
 
+  let audiobookbayChip = wrap.querySelector(`[${CHIP_ATTR}="audiobookbay"]`)
+  if (!(audiobookbayChip instanceof HTMLElement) && enabledBySource.audiobookbay) {
+    audiobookbayChip = makeChip("audiobookbay", bookTitle)
+  }
+  if (audiobookbayChip instanceof HTMLElement && enabledBySource.audiobookbay) {
+    audiobookbayChip.setAttribute("data-search-query", bookTitle)
+    orderedChips.push(audiobookbayChip)
+  }
+
   let gutenbergChip = wrap.querySelector(`[${CHIP_ATTR}="gutenberg"]`)
   if (!(gutenbergChip instanceof HTMLElement) && enabledBySource.gutenberg) {
     gutenbergChip = makeChip("gutenberg", searchQuery)
@@ -302,11 +332,17 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
 const enabledBySource: Record<SourceKey, boolean> = {
   zlib: true,
   anna: true,
+  audiobookbay: true,
   gutenberg: true
 }
 
 const syncChipToState = () => {
-  if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) {
+  if (
+    !enabledBySource.zlib &&
+    !enabledBySource.anna &&
+    !enabledBySource.audiobookbay &&
+    !enabledBySource.gutenberg
+  ) {
     removeChip()
     return
   }
@@ -316,16 +352,28 @@ const syncChipToState = () => {
 
 const initializeEnabledState = () => {
   chrome.storage.sync.get(
-    [ZLIB_ENABLED_KEY, ANNA_ENABLED_KEY, GUTENBERG_ENABLED_KEY, ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY],
+    [
+      ZLIB_ENABLED_KEY,
+      ANNA_ENABLED_KEY,
+      AUDIOBOOKBAY_ENABLED_KEY,
+      GUTENBERG_ENABLED_KEY,
+      ZLIB_DOMAIN_KEY,
+      ANNA_DOMAIN_KEY,
+      AUDIOBOOKBAY_DOMAIN_KEY
+    ],
     (result) => {
       const zlibStored = result[ZLIB_ENABLED_KEY]
       const annaStored = result[ANNA_ENABLED_KEY]
+      const audiobookbayStored = result[AUDIOBOOKBAY_ENABLED_KEY]
       const gutenbergStored = result[GUTENBERG_ENABLED_KEY]
       const domainStored = result[ZLIB_DOMAIN_KEY]
       const annaDomainStored = result[ANNA_DOMAIN_KEY]
+      const audiobookbayDomainStored = result[AUDIOBOOKBAY_DOMAIN_KEY]
 
       enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
       enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
+      enabledBySource.audiobookbay =
+        typeof audiobookbayStored === "boolean" ? audiobookbayStored : true
       enabledBySource.gutenberg =
         typeof gutenbergStored === "boolean" ? gutenbergStored : true
 
@@ -334,6 +382,9 @@ const initializeEnabledState = () => {
       }
       if (annaDomainStored) {
         currentAnnaDomain = annaDomainStored
+      }
+      if (audiobookbayDomainStored) {
+        currentAudiobookbayDomain = normalizeAudiobookbayDomain(audiobookbayDomainStored)
       }
 
       syncChipToState()
@@ -347,8 +398,14 @@ let injectTimeout: ReturnType<typeof setTimeout> | null = null
 let lastUrl = window.location.href
 
 const handleDomChange = () => {
-  debugger
-  if (!enabledBySource.zlib && !enabledBySource.anna && !enabledBySource.gutenberg) return
+  if (
+    !enabledBySource.zlib &&
+    !enabledBySource.anna &&
+    !enabledBySource.audiobookbay &&
+    !enabledBySource.gutenberg
+  ) {
+    return
+  }
 
   if (injectTimeout) {
     clearTimeout(injectTimeout)
@@ -382,6 +439,12 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if (ANNA_DOMAIN_KEY in changes) {
     currentAnnaDomain = changes[ANNA_DOMAIN_KEY].newValue || DEFAULT_ANNA_DOMAIN
   }
+  if (AUDIOBOOKBAY_DOMAIN_KEY in changes) {
+    currentAudiobookbayDomain =
+      normalizeAudiobookbayDomain(
+        changes[AUDIOBOOKBAY_DOMAIN_KEY].newValue || DEFAULT_AUDIOBOOKBAY_DOMAIN
+      )
+  }
 
   if (ZLIB_ENABLED_KEY in changes) {
     const zlibNext = changes[ZLIB_ENABLED_KEY].newValue
@@ -390,6 +453,11 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if (ANNA_ENABLED_KEY in changes) {
     const annaNext = changes[ANNA_ENABLED_KEY].newValue
     enabledBySource.anna = typeof annaNext === "boolean" ? annaNext : true
+  }
+  if (AUDIOBOOKBAY_ENABLED_KEY in changes) {
+    const audiobookbayNext = changes[AUDIOBOOKBAY_ENABLED_KEY].newValue
+    enabledBySource.audiobookbay =
+      typeof audiobookbayNext === "boolean" ? audiobookbayNext : true
   }
   if (GUTENBERG_ENABLED_KEY in changes) {
     const gutenbergNext = changes[GUTENBERG_ENABLED_KEY].newValue
