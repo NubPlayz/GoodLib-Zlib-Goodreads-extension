@@ -97,6 +97,11 @@
   background: #00d1b2;
 }
 
+.popup-avatar--audiobookbay {
+  background: #b45309;
+  font-size: 12px;
+}
+
 .popup-avatar--gutenberg {
   background: #ffcc3e;
   color: #333333;
@@ -188,6 +193,10 @@
 
 .popup-toggle input:checked+.popup-toggle-track.anna-switch {
   background: #10b981;
+}
+
+.popup-toggle input:checked+.popup-toggle-track.audiobookbay-switch {
+  background: #d97706;
 }
 
 .popup-toggle input:checked+.popup-toggle-track.gutenberg-switch {
