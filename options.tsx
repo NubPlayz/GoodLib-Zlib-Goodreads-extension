@@ -2,9 +2,11 @@ import { useEffect, useState } from "react"
 import "./options.css"
 
 const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-library.gs"
+const DEFAULT_DOMAIN = "1lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
 const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
+const AUDIOBOOKBAY_DOMAIN_KEY = "audiobookbayDomain"
+const DEFAULT_AUDIOBOOKBAY_DOMAIN = "https://audiobookbay.lu"
 
 const domains = [
   "z-library.gs",
@@ -23,15 +25,35 @@ const annaDomains = [
   "annas-archive.pk"
 ]
 
+const audiobookbayDomains = [
+  "https://audiobookbay.lu",
+  "https://audiobookbay.li",
+  "https://audiobookbay.fi",
+  "https://audiobookbay.nl",
+  "https://audiobookbay.is",
+  "https://audiobookbay.se"
+]
+
+const formatDomainLabel = (domain: string) => domain.replace(/^https?:\/\//, "")
+
 function OptionsIndex() {
   const [selectedDomain, setSelectedDomain] = useState(DEFAULT_DOMAIN)
   const [selectedAnnaDomain, setSelectedAnnaDomain] = useState(DEFAULT_ANNA_DOMAIN)
+  const [selectedAudiobookbayDomain, setSelectedAudiobookbayDomain] = useState(
+    DEFAULT_AUDIOBOOKBAY_DOMAIN
+  )
 
   useEffect(() => {
-    chrome.storage.sync.get([ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY], (res) => {
-      if (res[ZLIB_DOMAIN_KEY]) setSelectedDomain(res[ZLIB_DOMAIN_KEY])
-      if (res[ANNA_DOMAIN_KEY]) setSelectedAnnaDomain(res[ANNA_DOMAIN_KEY])
-    })
+    chrome.storage.sync.get(
+      [ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY, AUDIOBOOKBAY_DOMAIN_KEY],
+      (res) => {
+        if (res[ZLIB_DOMAIN_KEY]) setSelectedDomain(res[ZLIB_DOMAIN_KEY])
+        if (res[ANNA_DOMAIN_KEY]) setSelectedAnnaDomain(res[ANNA_DOMAIN_KEY])
+        if (res[AUDIOBOOKBAY_DOMAIN_KEY]) {
+          setSelectedAudiobookbayDomain(res[AUDIOBOOKBAY_DOMAIN_KEY])
+        }
+      }
+    )
   }, [])
 
   const handleDomainChange = (domain: string) => {
@@ -44,12 +66,17 @@ function OptionsIndex() {
     chrome.storage.sync.set({ [ANNA_DOMAIN_KEY]: domain })
   }
 
+  const handleAudiobookbayDomainChange = (domain: string) => {
+    setSelectedAudiobookbayDomain(domain)
+    chrome.storage.sync.set({ [AUDIOBOOKBAY_DOMAIN_KEY]: domain })
+  }
+
   return (
     <div className="options-container">
       <div className="options-card">
         <div className="header-small">Goodlib Preferences</div>
         <h1 className="title-main">GoodLIB</h1>
-        <p className="last-updated">Customize domain.</p>
+        <p className="last-updated">Customize source domains.</p>
 
         <section className="mirror-selection">
           <h2>Z-Library Mirror</h2>
@@ -73,6 +100,21 @@ function OptionsIndex() {
           >
             {annaDomains.map(d => (
               <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </section>
+
+        <section className="mirror-selection">
+          <h2>AudiobookBay Mirror</h2>
+          <p className="description">Select the domain used to search for books on AudiobookBay.</p>
+          <select
+            value={selectedAudiobookbayDomain}
+            onChange={(e) => handleAudiobookbayDomainChange(e.target.value)}
+          >
+            {audiobookbayDomains.map((domain) => (
+              <option key={domain} value={domain}>
+                {formatDomainLabel(domain)}
+              </option>
             ))}
           </select>
         </section>
