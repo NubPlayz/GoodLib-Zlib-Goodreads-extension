@@ -1,17 +1,21 @@
 import { animate } from "animejs"
+import { useEffect, useState, type ChangeEvent } from "react"
 
 import "./popup.css"
 import mascotCat from "./mascot cat.png"
 
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
+const AUDIOBOOKBAY_ENABLED_KEY = "audiobookbayEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-library.gs"
 const ANNA_DOMAIN_KEY = "annaDomain"
 const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
+const AUDIOBOOKBAY_DOMAIN_KEY = "audiobookbayDomain"
+const DEFAULT_AUDIOBOOKBAY_DOMAIN = "https://audiobookbay.lu"
 
-type SourceKey = "zlib" | "anna" | "gutenberg"
+type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg"
 
 type SourceConfig = {
   avatarClassName?: string
@@ -24,10 +28,8 @@ type SourceConfig = {
   trackClassName: string
 }
 
-type SourceElements = {
-  input: HTMLInputElement
-  row: HTMLDivElement
-}
+type SourceState = Record<SourceKey, boolean>
+type SubtitleState = Record<SourceKey, string>
 
 const sourceConfig: Record<SourceKey, SourceConfig> = {
   zlib: {
@@ -49,6 +51,16 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     tagClassName: "anime-tag-anna",
     trackClassName: "anna-switch"
   },
+  audiobookbay: {
+    avatarClassName: "popup-avatar--audiobookbay",
+    avatarText: "AB",
+    label: "AudiobookBay",
+    rowClassName: "anime-row-audiobookbay",
+    storageKey: AUDIOBOOKBAY_ENABLED_KEY,
+    subtitle: "audiobookbay.lu",
+    tagClassName: "anime-tag-audiobookbay",
+    trackClassName: "audiobookbay-switch"
+  },
   gutenberg: {
     avatarClassName: "popup-avatar--gutenberg",
     avatarText: "PG",
@@ -61,34 +73,24 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
   }
 }
 
-const sourceKeys: SourceKey[] = ["zlib", "anna", "gutenberg"]
+const sourceKeys: SourceKey[] = ["zlib", "anna", "audiobookbay", "gutenberg"]
 
-const sourceElements = {} as Record<SourceKey, SourceElements>
-
-const createElement = <K extends keyof HTMLElementTagNameMap>(
-  tagName: K,
-  className?: string,
-  textContent?: string
-) => {
-  const element = document.createElement(tagName)
-  if (className) {
-    element.className = className
-  }
-  if (textContent !== undefined) {
-    element.textContent = textContent
-  }
-  return element
+const defaultSourceState: SourceState = {
+  zlib: true,
+  anna: true,
+  audiobookbay: true,
+  gutenberg: true
 }
 
-const applySourceState = (source: SourceKey, isEnabled: boolean) => {
-  const elements = sourceElements[source]
-  if (!elements) {
-    return
-  }
-
-  elements.input.checked = isEnabled
-  elements.row.classList.toggle("popup-row--off", !isEnabled)
+const defaultSubtitles: SubtitleState = {
+  zlib: DEFAULT_DOMAIN,
+  anna: DEFAULT_ANNA_DOMAIN,
+  audiobookbay: "audiobookbay.lu",
+  gutenberg: sourceConfig.gutenberg.subtitle
 }
+
+const formatDomainSubtitle = (value: string) =>
+  value.replace(/^https?:\/\//, "").replace(/\/+$/, "")
 
 const runToggleAnimation = (source: SourceKey, isEnabled: boolean) => {
   animate(`.anime-row-${source}`, {
@@ -105,189 +107,217 @@ const runToggleAnimation = (source: SourceKey, isEnabled: boolean) => {
   })
 }
 
-const createActionLink = (label: string, href: string, leadingText?: string) => {
-  const link = createElement("a", "popup-action-btn")
-  link.href = href
-  link.target = "_blank"
-  link.rel = "noopener noreferrer"
+const isBoolean = (value: unknown): value is boolean => typeof value === "boolean"
+const isString = (value: unknown): value is string => typeof value === "string"
 
-  if (leadingText) {
-    const leading = createElement("span", "popup-action-star", leadingText)
-    leading.setAttribute("aria-hidden", "true")
-    link.appendChild(leading)
-  }
+const getSourceStateFromStorage = (result: Record<string, unknown>): SourceState => ({
+  zlib: isBoolean(result[ZLIB_ENABLED_KEY]) ? result[ZLIB_ENABLED_KEY] : defaultSourceState.zlib,
+  anna: isBoolean(result[ANNA_ENABLED_KEY]) ? result[ANNA_ENABLED_KEY] : defaultSourceState.anna,
+  audiobookbay: isBoolean(result[AUDIOBOOKBAY_ENABLED_KEY])
+    ? result[AUDIOBOOKBAY_ENABLED_KEY]
+    : defaultSourceState.audiobookbay,
+  gutenberg: isBoolean(result[GUTENBERG_ENABLED_KEY])
+    ? result[GUTENBERG_ENABLED_KEY]
+    : defaultSourceState.gutenberg
+})
 
-  link.appendChild(createElement("span", undefined, label))
+const getSubtitlesFromStorage = (result: Record<string, unknown>): SubtitleState => ({
+  zlib: isString(result[ZLIB_DOMAIN_KEY]) ? result[ZLIB_DOMAIN_KEY] : DEFAULT_DOMAIN,
+  anna: isString(result[ANNA_DOMAIN_KEY]) ? result[ANNA_DOMAIN_KEY] : DEFAULT_ANNA_DOMAIN,
+  audiobookbay: formatDomainSubtitle(
+    isString(result[AUDIOBOOKBAY_DOMAIN_KEY])
+      ? result[AUDIOBOOKBAY_DOMAIN_KEY]
+      : DEFAULT_AUDIOBOOKBAY_DOMAIN
+  ),
+  gutenberg: sourceConfig.gutenberg.subtitle
+})
 
-  return link
-}
+function Popup() {
+  const [sourceState, setSourceState] = useState<SourceState>(() => ({ ...defaultSourceState }))
+  const [subtitles, setSubtitles] = useState<SubtitleState>(() => ({ ...defaultSubtitles }))
 
-const createSettingsBtn = () => {
-  const btn = createElement("button", "popup-action-btn popup-settings-btn")
+  useEffect(() => {
+    chrome.storage.sync.get(
+      [
+        ZLIB_ENABLED_KEY,
+        ANNA_ENABLED_KEY,
+        AUDIOBOOKBAY_ENABLED_KEY,
+        GUTENBERG_ENABLED_KEY,
+        ZLIB_DOMAIN_KEY,
+        ANNA_DOMAIN_KEY,
+        AUDIOBOOKBAY_DOMAIN_KEY
+      ],
+      (result) => {
+        setSourceState(getSourceStateFromStorage(result))
+        setSubtitles(getSubtitlesFromStorage(result))
+      }
+    )
 
-  const icon = createElement("span", "popup-action-star", "⚙")
-  icon.setAttribute("aria-hidden", "true")
+    const handleStorageChange = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      areaName: string
+    ) => {
+      if (areaName !== "sync") {
+        return
+      }
 
-  btn.append(icon, createElement("span", undefined, "Settings"))
+      setSourceState((currentState) => {
+        let didChange = false
+        const nextState = { ...currentState }
 
-  btn.addEventListener("click", () => {
+        for (const source of sourceKeys) {
+          const change = changes[sourceConfig[source].storageKey]
+          if (!change) {
+            continue
+          }
+
+          nextState[source] = isBoolean(change.newValue)
+            ? change.newValue
+            : defaultSourceState[source]
+          didChange = true
+        }
+
+        return didChange ? nextState : currentState
+      })
+
+      setSubtitles((currentSubtitles) => {
+        let didChange = false
+        const nextSubtitles = { ...currentSubtitles }
+
+        if (ZLIB_DOMAIN_KEY in changes) {
+          nextSubtitles.zlib = isString(changes[ZLIB_DOMAIN_KEY].newValue)
+            ? changes[ZLIB_DOMAIN_KEY].newValue
+            : DEFAULT_DOMAIN
+          didChange = true
+        }
+
+        if (ANNA_DOMAIN_KEY in changes) {
+          nextSubtitles.anna = isString(changes[ANNA_DOMAIN_KEY].newValue)
+            ? changes[ANNA_DOMAIN_KEY].newValue
+            : DEFAULT_ANNA_DOMAIN
+          didChange = true
+        }
+
+        if (AUDIOBOOKBAY_DOMAIN_KEY in changes) {
+          nextSubtitles.audiobookbay = formatDomainSubtitle(
+            isString(changes[AUDIOBOOKBAY_DOMAIN_KEY].newValue)
+              ? changes[AUDIOBOOKBAY_DOMAIN_KEY].newValue
+              : DEFAULT_AUDIOBOOKBAY_DOMAIN
+          )
+          didChange = true
+        }
+
+        return didChange ? nextSubtitles : currentSubtitles
+      })
+    }
+
+    chrome.storage.onChanged.addListener(handleStorageChange)
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange)
+    }
+  }, [])
+
+  const handleToggle =
+    (source: SourceKey) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = event.currentTarget.checked
+
+      setSourceState((currentState) => ({
+        ...currentState,
+        [source]: nextValue
+      }))
+
+      chrome.storage.sync.set({ [sourceConfig[source].storageKey]: nextValue })
+      runToggleAnimation(source, nextValue)
+    }
+
+  const handleOpenSettings = () => {
     chrome.runtime.openOptionsPage()
     window.close()
-  })
-
-  return btn
-}
-
-const createPopupRow = (source: SourceKey) => {
-  const config = sourceConfig[source]
-  const row = createElement("div", `popup-row ${config.rowClassName}`)
-
-  const avatarClassName = [
-    "popup-avatar",
-    config.avatarClassName,
-    config.tagClassName
-  ]
-    .filter(Boolean)
-    .join(" ")
-
-  const avatar = createElement("div", avatarClassName, config.avatarText)
-
-  const copy = createElement("div", "popup-copy")
-  copy.append(
-    createElement("div", "popup-name", config.label),
-    createElement("div", "popup-subtitle", config.subtitle)
-  )
-
-  const toggle = createElement("label", "popup-toggle")
-  const input = createElement("input") as HTMLInputElement
-  input.type = "checkbox"
-  input.checked = true
-  input.addEventListener("change", () => {
-    const nextValue = input.checked
-    applySourceState(source, nextValue)
-    chrome.storage.sync.set({ [config.storageKey]: nextValue })
-    runToggleAnimation(source, nextValue)
-  })
-
-  const track = createElement("span", `popup-toggle-track ${config.trackClassName}`)
-  toggle.append(input, track)
-
-  row.append(avatar, copy, toggle)
-  sourceElements[source] = { input, row }
-
-  return row
-}
-
-const syncFromStorage = () => {
-  chrome.storage.sync.get(
-    [...sourceKeys.map((source) => sourceConfig[source].storageKey), ZLIB_DOMAIN_KEY, ANNA_DOMAIN_KEY],
-    (result) => {
-
-      const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
-      if (zlibSubtitle) {
-        zlibSubtitle.textContent = result[ZLIB_DOMAIN_KEY] || DEFAULT_DOMAIN
-      }
-
-      const annaSubtitle = sourceElements.anna?.row.querySelector(".popup-subtitle")
-      if (annaSubtitle) {
-        annaSubtitle.textContent = result[ANNA_DOMAIN_KEY] || DEFAULT_ANNA_DOMAIN
-      }
-
-      for (const source of sourceKeys) {
-        const storedValue = result[sourceConfig[source].storageKey]
-        applySourceState(source, typeof storedValue === "boolean" ? storedValue : true)
-      }
-    }
-  )
-}
-
-const mountPopup = () => {
-  const root = document.getElementById("__plasmo")
-  if (!(root instanceof HTMLElement) || root.childElementCount > 0) {
-    return
   }
 
-  const popup = createElement("div", "popup")
+  return (
+    <div className="popup">
+      <div className="popup-header">
+        <h2 className="popup-title">
+          <span className="popup-title-base">Good</span>
+          <span className="popup-title-l">L</span>
+          <span className="popup-title-i">I</span>
+          <span className="popup-title-b">B</span>
+        </h2>
 
-  const header = createElement("div", "popup-header")
-  const title = createElement("h2", "popup-title")
-  title.append(
-    createElement("span", "popup-title-base", "Good"),
-    createElement("span", "popup-title-l", "L"),
-    createElement("span", "popup-title-i", "I"),
-    createElement("span", "popup-title-b", "B")
+        <div className="popup-mascot" aria-label="Goodlib mascot cat" title="Mascot">
+          <img className="popup-mascot-image" src={mascotCat} alt="Mascot cat" />
+        </div>
+      </div>
+
+      <div className="popup-card">
+        {sourceKeys.map((source) => {
+          const config = sourceConfig[source]
+          const avatarClassName = [
+            "popup-avatar",
+            config.avatarClassName,
+            config.tagClassName
+          ]
+            .filter(Boolean)
+            .join(" ")
+
+          return (
+            <div
+              key={source}
+              className={`popup-row ${config.rowClassName}${sourceState[source] ? "" : " popup-row--off"}`}>
+              <div className={avatarClassName}>{config.avatarText}</div>
+
+              <div className="popup-copy">
+                <div className="popup-name">{config.label}</div>
+                <div className="popup-subtitle">{subtitles[source]}</div>
+              </div>
+
+              <label className="popup-toggle">
+                <input
+                  type="checkbox"
+                  checked={sourceState[source]}
+                  onChange={handleToggle(source)}
+                />
+                <span className={`popup-toggle-track ${config.trackClassName}`} />
+              </label>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="popup-footer">
+        <div className="popup-subtitle popup-footer-help">Link not working? Check settings!</div>
+
+        <a
+          className="popup-action-btn"
+          href="https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension"
+          target="_blank"
+          rel="noopener noreferrer">
+          <span className="popup-action-star" aria-hidden="true">
+            *
+          </span>
+          <span>GitHub</span>
+        </a>
+
+        <a
+          className="popup-action-btn"
+          href="https://goodlib.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer">
+          <span>Site</span>
+        </a>
+
+        <button className="popup-action-btn popup-settings-btn" onClick={handleOpenSettings}>
+          <span className="popup-action-star" aria-hidden="true">
+                ⚙
+          </span>
+          <span>Settings</span>
+        </button>
+      </div>
+    </div>
   )
-
-  const mascotWrap = createElement("div", "popup-mascot")
-  mascotWrap.setAttribute("aria-label", "Goodlib mascot cat")
-  mascotWrap.title = "Mascot"
-
-  const mascotImage = createElement("img", "popup-mascot-image") as HTMLImageElement
-  mascotImage.src = mascotCat
-  mascotImage.alt = "Mascot cat"
-  mascotWrap.appendChild(mascotImage)
-
-  header.append(title, mascotWrap)
-
-  const card = createElement("div", "popup-card")
-  for (const source of sourceKeys) {
-    card.appendChild(createPopupRow(source))
-  }
-
-  const footer = createElement("div", "popup-footer")
-  const helpText = createElement("div", "popup-subtitle popup-footer-help", "Link not working? check settings!")
-
-  footer.append(
-    helpText,
-    createActionLink(
-      "GitHub",
-      "https://github.com/NubPlayz/GoodLib-Zlib-Goodreads-extension",
-      "*"
-    ),
-    createActionLink("Site", "https://goodlib.vercel.app"),
-    createSettingsBtn()
-  )
-
-  popup.append(header, card, footer)
-  root.appendChild(popup)
-
-  syncFromStorage()
-
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName !== "sync") {
-      return
-    }
-
-    if (ZLIB_DOMAIN_KEY in changes) {
-      const zlibSubtitle = sourceElements.zlib?.row.querySelector(".popup-subtitle")
-      if (zlibSubtitle) {
-        zlibSubtitle.textContent = changes[ZLIB_DOMAIN_KEY].newValue || DEFAULT_DOMAIN
-      }
-    }
-
-    if (ANNA_DOMAIN_KEY in changes) {
-      const annaSubtitle = sourceElements.anna?.row.querySelector(".popup-subtitle")
-      if (annaSubtitle) {
-        annaSubtitle.textContent = changes[ANNA_DOMAIN_KEY].newValue || DEFAULT_ANNA_DOMAIN
-      }
-    }
-
-    for (const source of sourceKeys) {
-      const change = changes[sourceConfig[source].storageKey]
-      if (!change) {
-        continue
-      }
-
-      applySourceState(
-        source,
-        typeof change.newValue === "boolean" ? change.newValue : true
-      )
-    }
-  })
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", mountPopup, { once: true })
-} else {
-  mountPopup()
-}
+export default Popup
