@@ -2,6 +2,7 @@
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?logo=googlechrome)](https://chromewebstore.google.com/detail/goodlib-zlib-annas-archiv/aiampblkjnmfogckjfiecodcnenleehp?authuser=0&hl=en)
 [![Firefox Add-ons](https://img.shields.io/badge/Firefox-Add--ons-orange?logo=firefox)](https://addons.mozilla.org/en-US/firefox/addon/goodlib-zlib-anna-s-archive/)
+[![Edge Addon](https://img.shields.io/badge/Edge-Addon-blue?logo=microsoftedge)](https://microsoftedge.microsoft.com/addons/detail/goodlib-zlib-annas-ar/hoifiaghenajmfpkfelkkgdnfnkbehob)
 ![Stars](https://img.shields.io/github/stars/NubPlayz/GoodLib-Zlib-Goodreads-extension?style=social)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
