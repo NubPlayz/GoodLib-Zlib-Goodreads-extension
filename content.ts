@@ -5,6 +5,7 @@ export const config = {
     "https://www.goodreads.com/book/*",
     "https://hardcover.app/*",
     "https://app.thestorygraph.com/*",
+    "https://beta.thestorygraph.com/*",
     "https://www.thestorygraph.com/*",
     "https://www.babelio.com/livres/*",
     "https://www.novelupdates.com/series/*"
