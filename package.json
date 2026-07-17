@@ -33,6 +33,7 @@
     },
     "host_permissions": [
       "https://www.goodreads.com/book/*",
+      "https://www.goodreads.com/*/book/*",
       "https://hardcover.app/*",
       "https://app.thestorygraph.com/*",
       "https://www.thestorygraph.com/*",
