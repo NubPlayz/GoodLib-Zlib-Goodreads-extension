@@ -3,6 +3,7 @@ import "./content.css"
 export const config = {
   matches: [
     "https://www.goodreads.com/book/*",
+    "https://www.goodreads.com/*/book/*",
     "https://hardcover.app/*",
     "https://app.thestorygraph.com/*",
     "https://beta.thestorygraph.com/*",
