@@ -13,6 +13,8 @@ GoodLib is a free, open source browser extension that injects source badges dire
 
 Learn more on [Offical site](https://goodlib.vercel.app)
 
+Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/detail/zlibrary-searcher/hacdelicpoafdkmkehadcdfkmkakiclf?hl=en) by [balldk](https://github.com/balldk)
+
 
 
 ## Features
