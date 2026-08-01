@@ -1,7 +1,7 @@
 .popup {
   min-width: 320px;
   max-width: 350px;
-  padding: 18px;
+  padding: 15px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
@@ -20,7 +20,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .popup-title-base {
@@ -41,8 +41,8 @@
 }
 
 .popup-mascot {
-  width: 68px;
-  height: 68px;
+  width: 56px;
+  height: 56px;
   border-radius: 0;
   overflow: visible;
   border: 0;
@@ -61,7 +61,7 @@
 .popup-card {
   border: 1px solid #dde3ee;
   border-radius: 16px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   background: #ffffff;
 }
 
@@ -69,7 +69,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 15px 0;
+  padding: 12px 0;
 }
 
 .popup-row+.popup-row {
@@ -105,6 +105,11 @@
 .popup-avatar--gutenberg {
   background: #ffcc3e;
   color: #333333;
+  font-size: 13px;
+}
+
+.popup-avatar--oceanofpdf {
+  background: #e11d48;
   font-size: 13px;
 }
 
@@ -203,12 +208,16 @@
   background: #f59e0b;
 }
 
+.popup-toggle input:checked+.popup-toggle-track.oceanofpdf-switch {
+  background: #e11d48;
+}
+
 .popup-toggle input:checked+.popup-toggle-track::before {
   transform: translateX(22px);
 }
 
 .popup-footer {
-  margin-top: 12px;
+  margin-top: 10px;
   display: flex;
   gap: 10px;
   justify-content: flex-start;
@@ -218,7 +227,7 @@
 .popup-footer-help {
   width: 100%;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   opacity: 1;
 }
 
@@ -228,7 +237,7 @@
   gap: 7px;
   justify-content: center;
   min-width: 120px;
-  padding: 10px 14px;
+  padding: 9px 13px;
   border-radius: 11px;
   background: #ffffff;
   color: #334155;

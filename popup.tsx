@@ -8,6 +8,7 @@ const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const AUDIOBOOKBAY_ENABLED_KEY = "audiobookbayEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
+const OCEANOFPDF_ENABLED_KEY = "oceanofpdfEnabled"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-library.gs"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -15,7 +16,7 @@ const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
 const AUDIOBOOKBAY_DOMAIN_KEY = "audiobookbayDomain"
 const DEFAULT_AUDIOBOOKBAY_DOMAIN = "https://audiobookbay.lu"
 
-type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg"
+type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg" | "oceanofpdf"
 
 type SourceConfig = {
   avatarClassName?: string
@@ -70,23 +71,35 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     subtitle: "gutenberg.org",
     tagClassName: "anime-tag-gutenberg",
     trackClassName: "gutenberg-switch"
+  },
+  oceanofpdf: {
+    avatarClassName: "popup-avatar--oceanofpdf",
+    avatarText: "OP",
+    label: "Ocean of PDF",
+    rowClassName: "anime-row-oceanofpdf",
+    storageKey: OCEANOFPDF_ENABLED_KEY,
+    subtitle: "oceanofpdf.com",
+    tagClassName: "anime-tag-oceanofpdf",
+    trackClassName: "oceanofpdf-switch"
   }
 }
 
-const sourceKeys: SourceKey[] = ["zlib", "anna", "audiobookbay", "gutenberg"]
+const sourceKeys: SourceKey[] = ["zlib", "anna", "audiobookbay", "oceanofpdf", "gutenberg"]
 
 const defaultSourceState: SourceState = {
-  zlib: true,
-  anna: true,
-  audiobookbay: true,
-  gutenberg: true
+  zlib: false,
+  anna: false,
+  audiobookbay: false,
+  gutenberg: true,
+  oceanofpdf: false
 }
 
 const defaultSubtitles: SubtitleState = {
   zlib: DEFAULT_DOMAIN,
   anna: DEFAULT_ANNA_DOMAIN,
   audiobookbay: "audiobookbay.lu",
-  gutenberg: sourceConfig.gutenberg.subtitle
+  gutenberg: sourceConfig.gutenberg.subtitle,
+  oceanofpdf: sourceConfig.oceanofpdf.subtitle
 }
 
 const formatDomainSubtitle = (value: string) =>
@@ -118,7 +131,10 @@ const getSourceStateFromStorage = (result: Record<string, unknown>): SourceState
     : defaultSourceState.audiobookbay,
   gutenberg: isBoolean(result[GUTENBERG_ENABLED_KEY])
     ? result[GUTENBERG_ENABLED_KEY]
-    : defaultSourceState.gutenberg
+    : defaultSourceState.gutenberg,
+  oceanofpdf: isBoolean(result[OCEANOFPDF_ENABLED_KEY])
+    ? result[OCEANOFPDF_ENABLED_KEY]
+    : defaultSourceState.oceanofpdf
 })
 
 const getSubtitlesFromStorage = (result: Record<string, unknown>): SubtitleState => ({
@@ -129,7 +145,8 @@ const getSubtitlesFromStorage = (result: Record<string, unknown>): SubtitleState
       ? result[AUDIOBOOKBAY_DOMAIN_KEY]
       : DEFAULT_AUDIOBOOKBAY_DOMAIN
   ),
-  gutenberg: sourceConfig.gutenberg.subtitle
+  gutenberg: sourceConfig.gutenberg.subtitle,
+  oceanofpdf: sourceConfig.oceanofpdf.subtitle
 })
 
 function Popup() {
@@ -143,6 +160,7 @@ function Popup() {
         ANNA_ENABLED_KEY,
         AUDIOBOOKBAY_ENABLED_KEY,
         GUTENBERG_ENABLED_KEY,
+        OCEANOFPDF_ENABLED_KEY,
         ZLIB_DOMAIN_KEY,
         ANNA_DOMAIN_KEY,
         AUDIOBOOKBAY_DOMAIN_KEY
