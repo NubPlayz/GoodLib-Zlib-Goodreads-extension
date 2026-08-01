@@ -72,6 +72,10 @@
   color: #333333;
 }
 
+.goodlib-chip--oceanofpdf .goodlib-chip-icon {
+  background: #e11d48;
+}
+
 .goodlib-chip-glyph {
   font-size: 9px;
   font-weight: 800;

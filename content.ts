@@ -19,6 +19,7 @@ const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const AUDIOBOOKBAY_ENABLED_KEY = "audiobookbayEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
+const OCEANOFPDF_ENABLED_KEY = "oceanofpdfEnabled"
 const CHIPS_WRAP_ATTR = "data-goodlib-chip-wrap"
 const HARDCOVER_HOST = "hardcover.app"
 const GOODREADS_HOST = "goodreads.com"
@@ -191,13 +192,14 @@ const removeChip = () => {
   }
 }
 
-type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg"
+type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg" | "oceanofpdf"
 
 const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
   zlib: { label: "Z-Lib", glyph: "z" },
   anna: { label: "Anna's", glyph: "A" },
   audiobookbay: { label: "AudiobookBay", glyph: "AB" },
-  gutenberg: { label: "Gutenberg", glyph: "PG" }
+  gutenberg: { label: "Gutenberg", glyph: "PG" },
+  oceanofpdf: { label: "OceanofPDF", glyph: "OP" }
 }
 
 let currentZlibDomain = DEFAULT_DOMAIN
@@ -227,6 +229,9 @@ const buildSourceUrl = (source: SourceKey, query: string) => {
   }
   if (source === "gutenberg") {
     return `https://www.gutenberg.org/ebooks/search/?query=${encoded}`
+  }
+  if (source === "oceanofpdf") {
+    return `https://oceanofpdf.com/?s=${encoded}`
   }
 
   return `https://${currentZlibDomain}/s/${encoded}`
@@ -309,6 +314,15 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
     orderedChips.push(audiobookbayChip)
   }
 
+  let oceanofpdfChip = wrap.querySelector(`[${CHIP_ATTR}="oceanofpdf"]`)
+  if (!(oceanofpdfChip instanceof HTMLElement) && enabledBySource.oceanofpdf) {
+    oceanofpdfChip = makeChip("oceanofpdf", searchQuery)
+  }
+  if (oceanofpdfChip instanceof HTMLElement && enabledBySource.oceanofpdf) {
+    oceanofpdfChip.setAttribute("data-search-query", searchQuery)
+    orderedChips.push(oceanofpdfChip)
+  }
+
   let gutenbergChip = wrap.querySelector(`[${CHIP_ATTR}="gutenberg"]`)
   if (!(gutenbergChip instanceof HTMLElement) && enabledBySource.gutenberg) {
     gutenbergChip = makeChip("gutenberg", searchQuery)
@@ -332,9 +346,10 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
 }
 
 const enabledBySource: Record<SourceKey, boolean> = {
-  zlib: true,
-  anna: true,
-  audiobookbay: true,
+  zlib: false,
+  anna: false,
+  audiobookbay: false,
+  oceanofpdf: false,
   gutenberg: true
 }
 
@@ -343,7 +358,8 @@ const syncChipToState = () => {
     !enabledBySource.zlib &&
     !enabledBySource.anna &&
     !enabledBySource.audiobookbay &&
-    !enabledBySource.gutenberg
+    !enabledBySource.gutenberg &&
+    !enabledBySource.oceanofpdf
   ) {
     removeChip()
     return
@@ -359,6 +375,7 @@ const initializeEnabledState = () => {
       ANNA_ENABLED_KEY,
       AUDIOBOOKBAY_ENABLED_KEY,
       GUTENBERG_ENABLED_KEY,
+      OCEANOFPDF_ENABLED_KEY,
       ZLIB_DOMAIN_KEY,
       ANNA_DOMAIN_KEY,
       AUDIOBOOKBAY_DOMAIN_KEY
@@ -368,14 +385,17 @@ const initializeEnabledState = () => {
       const annaStored = result[ANNA_ENABLED_KEY]
       const audiobookbayStored = result[AUDIOBOOKBAY_ENABLED_KEY]
       const gutenbergStored = result[GUTENBERG_ENABLED_KEY]
+      const oceanofpdfStored = result[OCEANOFPDF_ENABLED_KEY]
       const domainStored = result[ZLIB_DOMAIN_KEY]
       const annaDomainStored = result[ANNA_DOMAIN_KEY]
       const audiobookbayDomainStored = result[AUDIOBOOKBAY_DOMAIN_KEY]
 
-      enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
-      enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
+      enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : false
+      enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : false
       enabledBySource.audiobookbay =
-        typeof audiobookbayStored === "boolean" ? audiobookbayStored : true
+        typeof audiobookbayStored === "boolean" ? audiobookbayStored : false
+      enabledBySource.oceanofpdf =
+        typeof oceanofpdfStored === "boolean" ? oceanofpdfStored : false
       enabledBySource.gutenberg =
         typeof gutenbergStored === "boolean" ? gutenbergStored : true
 
@@ -404,7 +424,8 @@ const handleDomChange = () => {
     !enabledBySource.zlib &&
     !enabledBySource.anna &&
     !enabledBySource.audiobookbay &&
-    !enabledBySource.gutenberg
+    !enabledBySource.gutenberg &&
+    !enabledBySource.oceanofpdf
   ) {
     return
   }
@@ -450,16 +471,21 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
   if (ZLIB_ENABLED_KEY in changes) {
     const zlibNext = changes[ZLIB_ENABLED_KEY].newValue
-    enabledBySource.zlib = typeof zlibNext === "boolean" ? zlibNext : true
+    enabledBySource.zlib = typeof zlibNext === "boolean" ? zlibNext : false
   }
   if (ANNA_ENABLED_KEY in changes) {
     const annaNext = changes[ANNA_ENABLED_KEY].newValue
-    enabledBySource.anna = typeof annaNext === "boolean" ? annaNext : true
+    enabledBySource.anna = typeof annaNext === "boolean" ? annaNext : false
   }
   if (AUDIOBOOKBAY_ENABLED_KEY in changes) {
     const audiobookbayNext = changes[AUDIOBOOKBAY_ENABLED_KEY].newValue
     enabledBySource.audiobookbay =
-      typeof audiobookbayNext === "boolean" ? audiobookbayNext : true
+      typeof audiobookbayNext === "boolean" ? audiobookbayNext : false
+  }
+  if (OCEANOFPDF_ENABLED_KEY in changes) {
+    const oceanofpdfNext = changes[OCEANOFPDF_ENABLED_KEY].newValue
+    enabledBySource.oceanofpdf =
+      typeof oceanofpdfNext === "boolean" ? oceanofpdfNext : false
   }
   if (GUTENBERG_ENABLED_KEY in changes) {
     const gutenbergNext = changes[GUTENBERG_ENABLED_KEY].newValue
