@@ -87,11 +87,11 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
 const sourceKeys: SourceKey[] = ["zlib", "anna", "audiobookbay", "oceanofpdf", "gutenberg"]
 
 const defaultSourceState: SourceState = {
-  zlib: false,
-  anna: false,
-  audiobookbay: false,
+  zlib: true,
+  anna: true,
+  audiobookbay: true,
   gutenberg: true,
-  oceanofpdf: false
+  oceanofpdf: true
 }
 
 const defaultSubtitles: SubtitleState = {
@@ -154,6 +154,8 @@ function Popup() {
   const [subtitles, setSubtitles] = useState<SubtitleState>(() => ({ ...defaultSubtitles }))
 
   useEffect(() => {
+    debugger;
+    
     chrome.storage.sync.get(
       [
         ZLIB_ENABLED_KEY,
@@ -238,17 +240,17 @@ function Popup() {
 
   const handleToggle =
     (source: SourceKey) =>
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const nextValue = event.currentTarget.checked
+      (event: ChangeEvent<HTMLInputElement>) => {
+        const nextValue = event.currentTarget.checked
 
-      setSourceState((currentState) => ({
-        ...currentState,
-        [source]: nextValue
-      }))
+        setSourceState((currentState) => ({
+          ...currentState,
+          [source]: nextValue
+        }))
 
-      chrome.storage.sync.set({ [sourceConfig[source].storageKey]: nextValue })
-      runToggleAnimation(source, nextValue)
-    }
+        chrome.storage.sync.set({ [sourceConfig[source].storageKey]: nextValue })
+        runToggleAnimation(source, nextValue)
+      }
 
   const handleOpenSettings = () => {
     chrome.runtime.openOptionsPage()
@@ -329,7 +331,7 @@ function Popup() {
 
         <button className="popup-action-btn popup-settings-btn" onClick={handleOpenSettings}>
           <span className="popup-action-star" aria-hidden="true">
-                ⚙
+            ⚙
           </span>
           <span>Settings</span>
         </button>

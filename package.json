@@ -1,7 +1,7 @@
 {
   "name": "goodlib",
   "displayName": "GoodLIB -Zlib & Anna's Archive Extension",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Open books from Goodreads,StoryGraph,Hardcover,Babelio and more in Z-Lib,Anna's Archive,AudiobookBay or GutenBerg in one click.",
   "author": "Plasmo Corp. <foss@plasmo.com>",
   "scripts": {

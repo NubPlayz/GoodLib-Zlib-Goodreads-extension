@@ -346,10 +346,10 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
 }
 
 const enabledBySource: Record<SourceKey, boolean> = {
-  zlib: false,
-  anna: false,
-  audiobookbay: false,
-  oceanofpdf: false,
+  zlib: true,
+  anna: true,
+  audiobookbay: true,
+  oceanofpdf: true,
   gutenberg: true
 }
 
@@ -390,12 +390,12 @@ const initializeEnabledState = () => {
       const annaDomainStored = result[ANNA_DOMAIN_KEY]
       const audiobookbayDomainStored = result[AUDIOBOOKBAY_DOMAIN_KEY]
 
-      enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : false
-      enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : false
+      enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
+      enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
       enabledBySource.audiobookbay =
-        typeof audiobookbayStored === "boolean" ? audiobookbayStored : false
+        typeof audiobookbayStored === "boolean" ? audiobookbayStored : true
       enabledBySource.oceanofpdf =
-        typeof oceanofpdfStored === "boolean" ? oceanofpdfStored : false
+        typeof oceanofpdfStored === "boolean" ? oceanofpdfStored : true
       enabledBySource.gutenberg =
         typeof gutenbergStored === "boolean" ? gutenbergStored : true
 
