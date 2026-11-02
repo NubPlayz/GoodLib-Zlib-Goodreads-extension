@@ -11,6 +11,8 @@
 
 GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads and Hardcover book pages. No more copying titles and searching manually 
 
+Renaud-Bray's French and English print-book (`Livres_Produit.aspx` or `livres_produit.aspx`, `books_product.aspx`) and e-book (`Livre_Numerique_Produit.aspx` or `livre_numerique_produit.aspx`, `ebook_product.aspx`) product pages are also supported when the URL contains a valid product `id`.
+
 Learn more on [Offical site](https://goodlib.vercel.app)
 
 Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/detail/zlibrary-searcher/hacdelicpoafdkmkehadcdfkmkakiclf?hl=en) by [balldk](https://github.com/balldk)

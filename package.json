@@ -38,7 +38,13 @@
       "https://app.thestorygraph.com/*",
       "https://www.thestorygraph.com/*",
       "https://www.babelio.com/livres/*",
-      "https://www.novelupdates.com/series/*"
+      "https://www.novelupdates.com/series/*",
+      "https://www.renaud-bray.com/Livres_Produit.aspx*",
+      "https://www.renaud-bray.com/livres_produit.aspx*",
+      "https://www.renaud-bray.com/books_product.aspx*",
+      "https://www.renaud-bray.com/Livre_Numerique_Produit.aspx*",
+      "https://www.renaud-bray.com/livre_numerique_produit.aspx*",
+      "https://www.renaud-bray.com/ebook_product.aspx*"
     ],
     "browser_specific_settings": {
       "gecko": {
