@@ -17,6 +17,9 @@ export const config = {
     "https://www.renaud-bray.com/livre_numerique_produit.aspx*",
     "https://www.renaud-bray.com/ebook_product.aspx*",
     "https://www.indigo.ca/products/*",
+    "https://www.fnac.com/a*",
+    "https://www.fnac.com/livre-numerique/a*",
+    "https://www.fnac.com/*/a*/w-4*",
     "https://www.amazon.com/dp/*",
     "https://www.amazon.com/*/dp/*",
     "https://www.amazon.com/gp/product/*",
@@ -127,6 +130,7 @@ const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
 const RENAUD_BRAY_HOST = "www.renaud-bray.com"
 const INDIGO_HOST = "www.indigo.ca"
+const FNAC_HOST = "www.fnac.com"
 const AMAZON_HOSTS = new Set([
   "www.amazon.com",
   "www.amazon.ca",
@@ -196,6 +200,15 @@ const renaudBrayAuthorSelectors = ["a.lnkItem[href*='Author=']"]
 const indigoTitleSelectors = ["h1.product__title.js-product-title"]
 const indigoAuthorSelectors = ["a.product__contributor-name.js-contributor-link"]
 
+const fnacTitleSelectors = [
+  "h1[data-automation-id='product-title-label']",
+  "h1[data-automation-id='pdp-productInformation-title']"
+]
+const fnacAuthorSelectors = [
+  ".f-productHeader-subTitle a[href*='/ia']",
+  "a[data-automation-id='pdp-productInformation-productTags-item-link'][href*='/ia']"
+]
+
 const amazonTitleSelectors = ["#productTitle"]
 const amazonAuthorSelectors = [
   "a.a-link-normal[href*='dp_byline_cont_book_'], a.a-link-normal[href*='dp_byline_cont_ebooks_'], a.a-link-normal[href*='dp_byline_cont_audible_']"
@@ -231,6 +244,27 @@ const isIndigoPage = () => {
       const isbn = (field.textContent ?? "").replace(/[\s-]/g, "")
       return (
         /^\s*ISBN\s*:/i.test(rowText) &&
+        /^(?:97[89]\d{10}|\d{9}[\dX])$/i.test(isbn)
+      )
+    }
+  )
+}
+
+const isFnacPage = () => {
+  if (
+    window.location.hostname !== FNAC_HOST ||
+    !/^\/(?:(?:livre-numerique\/)?a[1-9]\d*(?:\/[^/]+)?|[^/]+\/a[1-9]\d*\/w-4)\/?$/.test(window.location.pathname)
+  ) {
+    return false
+  }
+
+  return Array.from(document.querySelectorAll(".f-productProperties__item, #features tr")).some(
+    (row) => {
+      const label = row.querySelector("dt, td:first-child")
+      const value = row.querySelector("dd, td:nth-child(2)")
+      const isbn = (value?.textContent ?? "").replace(/[\s-]/g, "")
+      return (
+        /^\s*ISBN\s*$/i.test(label?.textContent ?? "") &&
         /^(?:97[89]\d{10}|\d{9}[\dX])$/i.test(isbn)
       )
     }
@@ -303,9 +337,11 @@ const getBookTitle = (): HTMLElement | null => {
             ? renaudBrayTitleSelectors
             : isIndigoPage()
               ? indigoTitleSelectors
-              : isAmazonPage()
-                ? amazonTitleSelectors
-                : null
+              : isFnacPage()
+                ? fnacTitleSelectors
+                : isAmazonPage()
+                  ? amazonTitleSelectors
+                  : null
 
   if (!selectors) return null
 
@@ -350,6 +386,16 @@ const getPrimaryAuthor = (): string => {
         }
       }
     }
+  }
+
+  if (isFnacPage()) {
+    for (const node of document.querySelectorAll(fnacAuthorSelectors.join(", "))) {
+      const match = normalizeText(node.textContent ?? "").match(/^(.*?)\s*\(Auteur\)$/i)
+      if (match && match[1].trim()) {
+        return match[1].trim()
+      }
+    }
+    return ""
   }
 
   const selectors = isStoryGraphPage()

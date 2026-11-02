@@ -15,6 +15,8 @@ Renaud-Bray's French and English print-book (`Livres_Produit.aspx` or `livres_pr
 
 Indigo's English- and French-language print books and e-books are supported on `/products/` pages with an ISBN in Product Details. Non-book products without an ISBN are excluded.
 
+Fnac France (`www.fnac.com`) print-book and e-book product pages are supported when the product's characteristics contain an ISBN. Both observed page layouts are handled, and author role labels are omitted from search queries. Non-book products without an ISBN are excluded.
+
 Amazon print-book, Kindle, Audible audiobook, and alternate-binding product pages are enabled across the 23 current retail storefronts listed below. Detection requires a book-author link plus an ISBN or Amazon's book-format selector, without relying on translated format labels.
 
 - Americas: `amazon.com`, `amazon.ca`, `amazon.com.mx`, `amazon.com.br`

@@ -5,6 +5,20 @@
   margin-left: 10px;
 }
 
+h1[data-automation-id="product-title-label"]:has(> .goodlib-chip-wrap),
+h1[data-automation-id="pdp-productInformation-title"]:has(> .goodlib-chip-wrap) {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+h1[data-automation-id="product-title-label"] > .goodlib-chip-wrap,
+h1[data-automation-id="pdp-productInformation-title"] > .goodlib-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 8px 0 0;
+}
+
 .goodlib-chip {
   display: inline-flex;
   align-items: center;
