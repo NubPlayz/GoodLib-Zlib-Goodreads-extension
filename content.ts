@@ -15,7 +15,8 @@ export const config = {
     "https://www.renaud-bray.com/books_product.aspx*",
     "https://www.renaud-bray.com/Livre_Numerique_Produit.aspx*",
     "https://www.renaud-bray.com/livre_numerique_produit.aspx*",
-    "https://www.renaud-bray.com/ebook_product.aspx*"
+    "https://www.renaud-bray.com/ebook_product.aspx*",
+    "https://www.indigo.ca/products/*"
   ]
 }
 
@@ -33,6 +34,7 @@ const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
 const RENAUD_BRAY_HOST = "www.renaud-bray.com"
+const INDIGO_HOST = "www.indigo.ca"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -74,6 +76,9 @@ const novelUpdatesAuthorSelectors = ["a[id='authtag']", "#authtag", "a[href*='/n
 const renaudBrayTitleSelectors = ["h1.lblTitle"]
 const renaudBrayAuthorSelectors = ["a.lnkItem[href*='Author=']"]
 
+const indigoTitleSelectors = ["h1.product__title.js-product-title"]
+const indigoAuthorSelectors = ["a.product__contributor-name.js-contributor-link"]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -89,6 +94,26 @@ const isRenaudBrayPage = () =>
   window.location.hostname === RENAUD_BRAY_HOST &&
   /^\/(livres_produit|books_product|livre_numerique_produit|ebook_product)\.aspx$/i.test(window.location.pathname) &&
   /^[1-9]\d*$/.test(new URLSearchParams(window.location.search).get("id") ?? "")
+
+const isIndigoPage = () => {
+  if (
+    window.location.hostname !== INDIGO_HOST ||
+    !/^\/products\/[^/]+\/?$/.test(window.location.pathname)
+  ) {
+    return false
+  }
+
+  return Array.from(document.querySelectorAll(".product-details__metafield")).some(
+    (field) => {
+      const rowText = field.closest("li")?.textContent ?? ""
+      const isbn = (field.textContent ?? "").replace(/[\s-]/g, "")
+      return (
+        /^\s*ISBN\s*:/i.test(rowText) &&
+        /^(?:97[89]\d{10}|\d{9}[\dX])$/i.test(isbn)
+      )
+    }
+  )
+}
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -124,7 +149,9 @@ const getBookTitle = (): HTMLElement | null => {
           ? novelUpdatesTitleSelectors
           : isRenaudBrayPage()
             ? renaudBrayTitleSelectors
-            : null
+            : isIndigoPage()
+              ? indigoTitleSelectors
+              : null
 
   if (!selectors) return null
 
@@ -181,7 +208,9 @@ const getPrimaryAuthor = (): string => {
           ? novelUpdatesAuthorSelectors
           : isRenaudBrayPage()
             ? renaudBrayAuthorSelectors
-            : null
+            : isIndigoPage()
+              ? indigoAuthorSelectors
+              : null
 
   if (!selectors) return ""
 

@@ -44,7 +44,8 @@
       "https://www.renaud-bray.com/books_product.aspx*",
       "https://www.renaud-bray.com/Livre_Numerique_Produit.aspx*",
       "https://www.renaud-bray.com/livre_numerique_produit.aspx*",
-      "https://www.renaud-bray.com/ebook_product.aspx*"
+      "https://www.renaud-bray.com/ebook_product.aspx*",
+      "https://www.indigo.ca/products/*"
     ],
     "browser_specific_settings": {
       "gecko": {
