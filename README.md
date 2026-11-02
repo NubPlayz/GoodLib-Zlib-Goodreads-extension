@@ -15,6 +15,15 @@ Renaud-Bray's French and English print-book (`Livres_Produit.aspx` or `livres_pr
 
 Indigo's English- and French-language print books and e-books are supported on `/products/` pages with an ISBN in Product Details. Non-book products without an ISBN are excluded.
 
+Amazon print-book, Kindle, Audible audiobook, and alternate-binding product pages are enabled across the 23 current retail storefronts listed below. Detection requires a book-author link plus an ISBN or Amazon's book-format selector, without relying on translated format labels.
+
+- Americas: `amazon.com`, `amazon.ca`, `amazon.com.mx`, `amazon.com.br`
+- Europe: `amazon.co.uk`, `amazon.ie`, `amazon.fr`, `amazon.de`, `amazon.it`, `amazon.es`, `amazon.nl`, `amazon.com.be`, `amazon.pl`, `amazon.se`, `amazon.com.tr`
+- Asia-Pacific: `amazon.co.jp`, `amazon.in`, `amazon.com.au`, `amazon.sg`
+- Middle East and Africa: `amazon.ae`, `amazon.sa`, `amazon.eg`, `amazon.co.za`
+
+Storefront coverage follows [Amazon's marketplace list](https://developer-docs.amazon/sp-api/docs/marketplace-ids). Regional page layouts still require browser verification.
+
 Learn more on [Offical site](https://goodlib.vercel.app)
 
 Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/detail/zlibrary-searcher/hacdelicpoafdkmkehadcdfkmkakiclf?hl=en) by [balldk](https://github.com/balldk)

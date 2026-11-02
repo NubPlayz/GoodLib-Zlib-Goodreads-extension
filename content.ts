@@ -16,7 +16,99 @@ export const config = {
     "https://www.renaud-bray.com/Livre_Numerique_Produit.aspx*",
     "https://www.renaud-bray.com/livre_numerique_produit.aspx*",
     "https://www.renaud-bray.com/ebook_product.aspx*",
-    "https://www.indigo.ca/products/*"
+    "https://www.indigo.ca/products/*",
+    "https://www.amazon.com/dp/*",
+    "https://www.amazon.com/*/dp/*",
+    "https://www.amazon.com/gp/product/*",
+    "https://www.amazon.com/*/gp/product/*",
+    "https://www.amazon.ca/dp/*",
+    "https://www.amazon.ca/*/dp/*",
+    "https://www.amazon.ca/gp/product/*",
+    "https://www.amazon.ca/*/gp/product/*",
+    "https://www.amazon.com.mx/dp/*",
+    "https://www.amazon.com.mx/*/dp/*",
+    "https://www.amazon.com.mx/gp/product/*",
+    "https://www.amazon.com.mx/*/gp/product/*",
+    "https://www.amazon.com.br/dp/*",
+    "https://www.amazon.com.br/*/dp/*",
+    "https://www.amazon.com.br/gp/product/*",
+    "https://www.amazon.com.br/*/gp/product/*",
+    "https://www.amazon.co.uk/dp/*",
+    "https://www.amazon.co.uk/*/dp/*",
+    "https://www.amazon.co.uk/gp/product/*",
+    "https://www.amazon.co.uk/*/gp/product/*",
+    "https://www.amazon.ie/dp/*",
+    "https://www.amazon.ie/*/dp/*",
+    "https://www.amazon.ie/gp/product/*",
+    "https://www.amazon.ie/*/gp/product/*",
+    "https://www.amazon.fr/dp/*",
+    "https://www.amazon.fr/*/dp/*",
+    "https://www.amazon.fr/gp/product/*",
+    "https://www.amazon.fr/*/gp/product/*",
+    "https://www.amazon.de/dp/*",
+    "https://www.amazon.de/*/dp/*",
+    "https://www.amazon.de/gp/product/*",
+    "https://www.amazon.de/*/gp/product/*",
+    "https://www.amazon.it/dp/*",
+    "https://www.amazon.it/*/dp/*",
+    "https://www.amazon.it/gp/product/*",
+    "https://www.amazon.it/*/gp/product/*",
+    "https://www.amazon.es/dp/*",
+    "https://www.amazon.es/*/dp/*",
+    "https://www.amazon.es/gp/product/*",
+    "https://www.amazon.es/*/gp/product/*",
+    "https://www.amazon.nl/dp/*",
+    "https://www.amazon.nl/*/dp/*",
+    "https://www.amazon.nl/gp/product/*",
+    "https://www.amazon.nl/*/gp/product/*",
+    "https://www.amazon.com.be/dp/*",
+    "https://www.amazon.com.be/*/dp/*",
+    "https://www.amazon.com.be/gp/product/*",
+    "https://www.amazon.com.be/*/gp/product/*",
+    "https://www.amazon.pl/dp/*",
+    "https://www.amazon.pl/*/dp/*",
+    "https://www.amazon.pl/gp/product/*",
+    "https://www.amazon.pl/*/gp/product/*",
+    "https://www.amazon.se/dp/*",
+    "https://www.amazon.se/*/dp/*",
+    "https://www.amazon.se/gp/product/*",
+    "https://www.amazon.se/*/gp/product/*",
+    "https://www.amazon.com.tr/dp/*",
+    "https://www.amazon.com.tr/*/dp/*",
+    "https://www.amazon.com.tr/gp/product/*",
+    "https://www.amazon.com.tr/*/gp/product/*",
+    "https://www.amazon.co.jp/dp/*",
+    "https://www.amazon.co.jp/*/dp/*",
+    "https://www.amazon.co.jp/gp/product/*",
+    "https://www.amazon.co.jp/*/gp/product/*",
+    "https://www.amazon.in/dp/*",
+    "https://www.amazon.in/*/dp/*",
+    "https://www.amazon.in/gp/product/*",
+    "https://www.amazon.in/*/gp/product/*",
+    "https://www.amazon.com.au/dp/*",
+    "https://www.amazon.com.au/*/dp/*",
+    "https://www.amazon.com.au/gp/product/*",
+    "https://www.amazon.com.au/*/gp/product/*",
+    "https://www.amazon.sg/dp/*",
+    "https://www.amazon.sg/*/dp/*",
+    "https://www.amazon.sg/gp/product/*",
+    "https://www.amazon.sg/*/gp/product/*",
+    "https://www.amazon.ae/dp/*",
+    "https://www.amazon.ae/*/dp/*",
+    "https://www.amazon.ae/gp/product/*",
+    "https://www.amazon.ae/*/gp/product/*",
+    "https://www.amazon.sa/dp/*",
+    "https://www.amazon.sa/*/dp/*",
+    "https://www.amazon.sa/gp/product/*",
+    "https://www.amazon.sa/*/gp/product/*",
+    "https://www.amazon.eg/dp/*",
+    "https://www.amazon.eg/*/dp/*",
+    "https://www.amazon.eg/gp/product/*",
+    "https://www.amazon.eg/*/gp/product/*",
+    "https://www.amazon.co.za/dp/*",
+    "https://www.amazon.co.za/*/dp/*",
+    "https://www.amazon.co.za/gp/product/*",
+    "https://www.amazon.co.za/*/gp/product/*"
   ]
 }
 
@@ -35,6 +127,31 @@ const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
 const RENAUD_BRAY_HOST = "www.renaud-bray.com"
 const INDIGO_HOST = "www.indigo.ca"
+const AMAZON_HOSTS = new Set([
+  "www.amazon.com",
+  "www.amazon.ca",
+  "www.amazon.com.mx",
+  "www.amazon.com.br",
+  "www.amazon.co.uk",
+  "www.amazon.ie",
+  "www.amazon.fr",
+  "www.amazon.de",
+  "www.amazon.it",
+  "www.amazon.es",
+  "www.amazon.nl",
+  "www.amazon.com.be",
+  "www.amazon.pl",
+  "www.amazon.se",
+  "www.amazon.com.tr",
+  "www.amazon.co.jp",
+  "www.amazon.in",
+  "www.amazon.com.au",
+  "www.amazon.sg",
+  "www.amazon.ae",
+  "www.amazon.sa",
+  "www.amazon.eg",
+  "www.amazon.co.za"
+])
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -79,6 +196,11 @@ const renaudBrayAuthorSelectors = ["a.lnkItem[href*='Author=']"]
 const indigoTitleSelectors = ["h1.product__title.js-product-title"]
 const indigoAuthorSelectors = ["a.product__contributor-name.js-contributor-link"]
 
+const amazonTitleSelectors = ["#productTitle"]
+const amazonAuthorSelectors = [
+  "a.a-link-normal[href*='dp_byline_cont_book_'], a.a-link-normal[href*='dp_byline_cont_ebooks_'], a.a-link-normal[href*='dp_byline_cont_audible_']"
+]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -113,6 +235,36 @@ const isIndigoPage = () => {
       )
     }
   )
+}
+
+const isAmazonPage = () => {
+  if (
+    !AMAZON_HOSTS.has(window.location.hostname) ||
+    !/^\/(?:-\/[a-z_-]+\/)?(?:(?:[^/]+\/)?dp|gp\/product)\/[A-Z0-9]{10}(?:\/|$)/i.test(window.location.pathname) ||
+    !document.querySelector(amazonAuthorSelectors[0])
+  ) {
+    return false
+  }
+
+  const hasIsbn = Array.from(document.querySelectorAll("li .a-text-bold, tr th")).some(
+    (label) => {
+      const row = label.closest("tr") ?? label.parentElement
+      const rowText = (row?.textContent ?? "").normalize("NFKC").replace(
+        /[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,
+        ""
+      )
+      const match = rowText.match(/^\s*ISBN[-\s]*(?:10|13)\s*:?\s*([\dX][\dX\s-]*)$/i)
+      if (!match) return false
+
+      const isbn = match[1].replace(/[\s-]/g, "")
+      return /^(?:97[89]\d{10}|\d{9}[\dX])$/i.test(isbn)
+    }
+  )
+  if (hasIsbn) return true
+
+  return document.querySelector(
+    'input[role="radio"][aria-checked="true"][aria-labelledby^="media_format_"], #tmmSwatchesList'
+  ) !== null
 }
 
 const getHardcoverTitle = (): HTMLElement | null => {
@@ -151,7 +303,9 @@ const getBookTitle = (): HTMLElement | null => {
             ? renaudBrayTitleSelectors
             : isIndigoPage()
               ? indigoTitleSelectors
-              : null
+              : isAmazonPage()
+                ? amazonTitleSelectors
+                : null
 
   if (!selectors) return null
 
@@ -210,7 +364,9 @@ const getPrimaryAuthor = (): string => {
             ? renaudBrayAuthorSelectors
             : isIndigoPage()
               ? indigoAuthorSelectors
-              : null
+              : isAmazonPage()
+                ? amazonAuthorSelectors
+                : null
 
   if (!selectors) return ""
 
