@@ -13,7 +13,8 @@ h1[data-automation-id="pdp-productInformation-title"]:has(> .goodlib-chip-wrap) 
 }
 
 h1[data-automation-id="product-title-label"] > .goodlib-chip-wrap,
-h1[data-automation-id="pdp-productInformation-title"] > .goodlib-chip-wrap {
+h1[data-automation-id="pdp-productInformation-title"] > .goodlib-chip-wrap,
+.goodlib-chip-wrap--barnes-noble {
   display: flex;
   flex-wrap: wrap;
   margin: 8px 0 0;

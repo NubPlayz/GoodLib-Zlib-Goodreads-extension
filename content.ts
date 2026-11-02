@@ -20,6 +20,7 @@ export const config = {
     "https://www.fnac.com/a*",
     "https://www.fnac.com/livre-numerique/a*",
     "https://www.fnac.com/*/a*/w-4*",
+    "https://www.barnesandnoble.com/w/*",
     "https://www.amazon.com/dp/*",
     "https://www.amazon.com/*/dp/*",
     "https://www.amazon.com/gp/product/*",
@@ -131,6 +132,7 @@ const NOVELUPDATES_HOST = "novelupdates.com"
 const RENAUD_BRAY_HOST = "www.renaud-bray.com"
 const INDIGO_HOST = "www.indigo.ca"
 const FNAC_HOST = "www.fnac.com"
+const BARNES_NOBLE_HOST = "www.barnesandnoble.com"
 const AMAZON_HOSTS = new Set([
   "www.amazon.com",
   "www.amazon.ca",
@@ -209,6 +211,11 @@ const fnacAuthorSelectors = [
   "a[data-automation-id='pdp-productInformation-productTags-item-link'][href*='/ia']"
 ]
 
+const barnesNobleTitleSelectors = ["h1.product__title"]
+const barnesNobleAuthorSelectors = [
+  ".product__header .product__contributor a[href^='/authors/']"
+]
+
 const amazonTitleSelectors = ["#productTitle"]
 const amazonAuthorSelectors = [
   "a.a-link-normal[href*='dp_byline_cont_book_'], a.a-link-normal[href*='dp_byline_cont_ebooks_'], a.a-link-normal[href*='dp_byline_cont_audible_']"
@@ -269,6 +276,52 @@ const isFnacPage = () => {
       )
     }
   )
+}
+
+const isBarnesNoblePage = () => {
+  const productPath = /^\/w\/[^/]+\/([1-9]\d*)\/?$/
+  const productId = window.location.pathname.match(productPath)?.[1]
+  if (window.location.hostname !== BARNES_NOBLE_HOST || !productId) {
+    return false
+  }
+
+  const selectedEan = new URLSearchParams(window.location.search).get("ean") ?? ""
+  const selectedFormat = normalizeText(
+    document.querySelector(".product__header .product__prices > div:first-child")?.textContent ?? ""
+  )
+  const hasBookFormat = /^(?:Paperback|Hardcover|eBook|Audiobook|Large Print(?: \((?:Paperback|Hardcover)\))?)$/i.test(selectedFormat)
+
+  for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
+    try {
+      const data = JSON.parse(script.textContent ?? "")
+      const nodes = Array.isArray(data) ? data : data?.["@graph"] ?? [data]
+      if (!Array.isArray(nodes)) continue
+
+      const hasBook = nodes.some((node) => {
+        const types = [node?.["@type"], node?.additionalType].flat()
+        if (!types.some((type) => /^(?:https?:\/\/schema\.org\/)?(?:Book|Audiobook)$/.test(type))) {
+          return (
+            types.includes("Product") &&
+            hasBookFormat &&
+            /^97[89]\d{10}$/.test(selectedEan) &&
+            node?.sku === selectedEan
+          )
+        }
+
+        const id = node?.["@id"] ?? node?.url
+        if (typeof id !== "string") return false
+        const url = new URL(id, window.location.href)
+        return (
+          url.hostname === BARNES_NOBLE_HOST &&
+          url.pathname.match(productPath)?.[1] === productId
+        )
+      })
+      if (hasBook) return true
+    } catch {
+      // Ignore malformed structured data and inspect the remaining scripts.
+    }
+  }
+  return false
 }
 
 const isAmazonPage = () => {
@@ -339,9 +392,11 @@ const getBookTitle = (): HTMLElement | null => {
               ? indigoTitleSelectors
               : isFnacPage()
                 ? fnacTitleSelectors
-                : isAmazonPage()
-                  ? amazonTitleSelectors
-                  : null
+                : isBarnesNoblePage()
+                  ? barnesNobleTitleSelectors
+                  : isAmazonPage()
+                    ? amazonTitleSelectors
+                    : null
 
   if (!selectors) return null
 
@@ -410,9 +465,11 @@ const getPrimaryAuthor = (): string => {
             ? renaudBrayAuthorSelectors
             : isIndigoPage()
               ? indigoAuthorSelectors
-              : isAmazonPage()
-                ? amazonAuthorSelectors
-                : null
+              : isBarnesNoblePage()
+                ? barnesNobleAuthorSelectors
+                : isAmazonPage()
+                  ? amazonAuthorSelectors
+                  : null
 
   if (!selectors) return ""
 
@@ -531,6 +588,9 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
     wrap = document.createElement("span")
     wrap.setAttribute(CHIPS_WRAP_ATTR, "true")
     wrap.className = "goodlib-chip-wrap"
+    if (isBarnesNoblePage()) {
+      wrap.classList.add("goodlib-chip-wrap--barnes-noble")
+    }
     title.appendChild(wrap)
   }
 

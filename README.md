@@ -17,6 +17,8 @@ Indigo's English- and French-language print books and e-books are supported on `
 
 Fnac France (`www.fnac.com`) print-book and e-book product pages are supported when the product's characteristics contain an ISBN. Both observed page layouts are handled, and author role labels are omitted from search queries. Non-book products without an ISBN are excluded.
 
+Barnes & Noble (`www.barnesandnoble.com`) print-book, large-print, NOOK e-book, and audiobook product pages are supported on `/w/` routes when structured metadata identifies the current product as a book or audiobook. For editions without a book-type marker, a selected book format and a matching ISBN-style `ean`/product SKU are required. Non-book products such as toys are excluded even when they have contributor links.
+
 Amazon print-book, Kindle, Audible audiobook, and alternate-binding product pages are enabled across the 23 current retail storefronts listed below. Detection requires a book-author link plus an ISBN or Amazon's book-format selector, without relying on translated format labels.
 
 - Americas: `amazon.com`, `amazon.ca`, `amazon.com.mx`, `amazon.com.br`
