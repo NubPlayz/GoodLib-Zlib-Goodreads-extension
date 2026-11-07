@@ -2,6 +2,8 @@ import "./content.css"
 
 export const config = {
   matches: [
+    "https://goodreads.com/book/*",
+    "https://goodreads.com/*/book/*",
     "https://www.goodreads.com/book/*",
     "https://www.goodreads.com/*/book/*",
     "https://hardcover.app/*",
