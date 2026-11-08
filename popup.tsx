@@ -35,6 +35,9 @@ type SourceConfig = {
 type SourceState = Record<SourceKey, boolean>
 type SubtitleState = Record<SourceKey, string>
 
+const formatDomainSubtitle = (value: string) =>
+  value.replace(/^https?:\/\//, "").replace(/\/+$/, "")
+
 const sourceConfig: Record<SourceKey, SourceConfig> = {
   zlib: {
     avatarText: "Z",
@@ -51,7 +54,7 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     label: "Anna's",
     rowClassName: "anime-row-anna",
     storageKey: ANNA_ENABLED_KEY,
-    subtitle: "annas-archive.gd",
+    subtitle: DEFAULT_ANNA_DOMAIN,
     tagClassName: "anime-tag-anna",
     trackClassName: "anna-switch"
   },
@@ -61,7 +64,7 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     label: "AudiobookBay",
     rowClassName: "anime-row-audiobookbay",
     storageKey: AUDIOBOOKBAY_ENABLED_KEY,
-    subtitle: "audiobookbay.lu",
+    subtitle: formatDomainSubtitle(DEFAULT_AUDIOBOOKBAY_DOMAIN),
     tagClassName: "anime-tag-audiobookbay",
     trackClassName: "audiobookbay-switch"
   },
@@ -100,13 +103,10 @@ const defaultSourceState: SourceState = {
 const defaultSubtitles: SubtitleState = {
   zlib: DEFAULT_DOMAIN,
   anna: DEFAULT_ANNA_DOMAIN,
-  audiobookbay: "audiobookbay.lu",
+  audiobookbay: formatDomainSubtitle(DEFAULT_AUDIOBOOKBAY_DOMAIN),
   gutenberg: sourceConfig.gutenberg.subtitle,
   oceanofpdf: sourceConfig.oceanofpdf.subtitle
 }
-
-const formatDomainSubtitle = (value: string) =>
-  value.replace(/^https?:\/\//, "").replace(/\/+$/, "")
 
 const runToggleAnimation = (source: SourceKey, isEnabled: boolean) => {
   animate(`.anime-row-${source}`, {

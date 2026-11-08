@@ -136,19 +136,15 @@ function OptionsIndex() {
   }
 
   const updateAnnaFilters = (updates: Partial<AnnaPreferences>) => {
-    setAnnaFilters((prev) => {
-      const next = { ...prev, ...updates }
-      chrome.storage.sync.set({ [ANNA_FILTERS_KEY]: next })
-      return next
-    })
+    const next = { ...annaFilters, ...updates }
+    setAnnaFilters(next)
+    chrome.storage.sync.set({ [ANNA_FILTERS_KEY]: next })
   }
 
   const updateZlibFilters = (updates: Partial<ZlibPreferences>) => {
-    setZlibFilters((prev) => {
-      const next = { ...prev, ...updates }
-      chrome.storage.sync.set({ [ZLIB_FILTERS_KEY]: next })
-      return next
-    })
+    const next = { ...zlibFilters, ...updates }
+    setZlibFilters(next)
+    chrome.storage.sync.set({ [ZLIB_FILTERS_KEY]: next })
   }
 
   const handleResetAnnaFilters = () => {

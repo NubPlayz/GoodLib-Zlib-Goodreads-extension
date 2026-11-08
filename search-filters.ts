@@ -527,7 +527,7 @@ export function buildAnnaSearchUrl(
   const cleanDomain = normalizeDomain(domain, DEFAULT_ANNA_DOMAIN)
   const encodedQuery = encodeURIComponent(query)
 
-  const hasSort = typeof preferences?.sort === "string"
+  const hasSort = Boolean(preferences?.sort)
   const hasFormats = Array.isArray(preferences?.formats) && preferences.formats.length > 0
   const hasLanguages = Array.isArray(preferences?.languages) && preferences.languages.length > 0
 
