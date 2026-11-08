@@ -11,6 +11,8 @@
 
 GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads and Hardcover book pages. No more copying titles and searching manually 
 
+Barnes & Noble (`www.barnesandnoble.com`) print-book, large-print, NOOK e-book, and audiobook product pages are supported on `/w/` routes when structured metadata identifies the current product as a book or audiobook. For editions without a book-type marker, a selected book format and a matching ISBN-style `ean`/product SKU are required. Non-book products such as toys are excluded even when they have contributor links.
+
 Learn more on [Offical site](https://goodlib.vercel.app)
 
 Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/detail/zlibrary-searcher/hacdelicpoafdkmkehadcdfkmkakiclf?hl=en) by [balldk](https://github.com/balldk)

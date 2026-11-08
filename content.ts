@@ -9,7 +9,8 @@ export const config = {
     "https://beta.thestorygraph.com/*",
     "https://www.thestorygraph.com/*",
     "https://www.babelio.com/livres/*",
-    "https://www.novelupdates.com/series/*"
+    "https://www.novelupdates.com/series/*",
+    "https://www.barnesandnoble.com/w/*"
   ]
 }
 
@@ -26,6 +27,7 @@ const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
+const BARNES_NOBLE_HOST = "www.barnesandnoble.com"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -64,6 +66,11 @@ const babelioAuthorSelectors = ["span[itemprop='author'] [itemprop='name']", "a[
 const novelUpdatesTitleSelectors = [".seriestitlenu", ".seriestitle", "div.seriestitlenu", ".series-title"]
 const novelUpdatesAuthorSelectors = ["a[id='authtag']", "#authtag", "a[href*='/nauthor/']", ".author"]
 
+const barnesNobleTitleSelectors = ["h1.product__title"]
+const barnesNobleAuthorSelectors = [
+  ".product__header .product__contributor a[href^='/authors/']"
+]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -75,6 +82,52 @@ const isBabelioPage = () =>
 const isNovelUpdatesPage = () =>
   window.location.hostname.endsWith(NOVELUPDATES_HOST) &&
   window.location.pathname.includes("/series/")
+
+const isBarnesNoblePage = () => {
+  const productPath = /^\/w\/[^/]+\/([1-9]\d*)\/?$/
+  const productId = window.location.pathname.match(productPath)?.[1]
+  if (window.location.hostname !== BARNES_NOBLE_HOST || !productId) {
+    return false
+  }
+
+  const selectedEan = new URLSearchParams(window.location.search).get("ean") ?? ""
+  const selectedFormat = normalizeText(
+    document.querySelector(".product__header .product__prices > div:first-child")?.textContent ?? ""
+  )
+  const hasBookFormat = /^(?:Paperback|Hardcover|eBook|Audiobook|Large Print(?: \((?:Paperback|Hardcover)\))?)$/i.test(selectedFormat)
+
+  for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
+    try {
+      const data = JSON.parse(script.textContent ?? "")
+      const nodes = Array.isArray(data) ? data : data?.["@graph"] ?? [data]
+      if (!Array.isArray(nodes)) continue
+
+      const hasBook = nodes.some((node) => {
+        const types = [node?.["@type"], node?.additionalType].flat()
+        if (!types.some((type) => /^(?:https?:\/\/schema\.org\/)?(?:Book|Audiobook)$/.test(type))) {
+          return (
+            types.includes("Product") &&
+            hasBookFormat &&
+            /^97[89]\d{10}$/.test(selectedEan) &&
+            node?.sku === selectedEan
+          )
+        }
+
+        const id = node?.["@id"] ?? node?.url
+        if (typeof id !== "string") return false
+        const url = new URL(id, window.location.href)
+        return (
+          url.hostname === BARNES_NOBLE_HOST &&
+          url.pathname.match(productPath)?.[1] === productId
+        )
+      })
+      if (hasBook) return true
+    } catch {
+      // Ignore malformed structured data and inspect the remaining scripts.
+    }
+  }
+  return false
+}
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -108,7 +161,9 @@ const getBookTitle = (): HTMLElement | null => {
         ? babelioTitleSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesTitleSelectors
-          : null
+          : isBarnesNoblePage()
+            ? barnesNobleTitleSelectors
+            : null
 
   if (!selectors) return null
 
@@ -163,7 +218,9 @@ const getPrimaryAuthor = (): string => {
         ? babelioAuthorSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesAuthorSelectors
-          : null
+          : isBarnesNoblePage()
+            ? barnesNobleAuthorSelectors
+            : null
 
   if (!selectors) return ""
 
@@ -282,6 +339,9 @@ const injectChips = (enabledBySource: Record<SourceKey, boolean>) => {
     wrap = document.createElement("span")
     wrap.setAttribute(CHIPS_WRAP_ATTR, "true")
     wrap.className = "goodlib-chip-wrap"
+    if (isBarnesNoblePage()) {
+      wrap.classList.add("goodlib-chip-wrap--barnes-noble")
+    }
     title.appendChild(wrap)
   }
 

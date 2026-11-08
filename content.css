@@ -5,6 +5,12 @@
   margin-left: 10px;
 }
 
+.goodlib-chip-wrap--barnes-noble {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 8px 0 0;
+}
+
 .goodlib-chip {
   display: inline-flex;
   align-items: center;
