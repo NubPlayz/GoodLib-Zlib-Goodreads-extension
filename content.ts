@@ -9,7 +9,13 @@ export const config = {
     "https://beta.thestorygraph.com/*",
     "https://www.thestorygraph.com/*",
     "https://www.babelio.com/livres/*",
-    "https://www.novelupdates.com/series/*"
+    "https://www.novelupdates.com/series/*",
+    "https://www.renaud-bray.com/Livres_Produit.aspx*",
+    "https://www.renaud-bray.com/livres_produit.aspx*",
+    "https://www.renaud-bray.com/books_product.aspx*",
+    "https://www.renaud-bray.com/Livre_Numerique_Produit.aspx*",
+    "https://www.renaud-bray.com/livre_numerique_produit.aspx*",
+    "https://www.renaud-bray.com/ebook_product.aspx*"
   ]
 }
 
@@ -26,6 +32,7 @@ const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
+const RENAUD_BRAY_HOST = "www.renaud-bray.com"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -64,6 +71,9 @@ const babelioAuthorSelectors = ["span[itemprop='author'] [itemprop='name']", "a[
 const novelUpdatesTitleSelectors = [".seriestitlenu", ".seriestitle", "div.seriestitlenu", ".series-title"]
 const novelUpdatesAuthorSelectors = ["a[id='authtag']", "#authtag", "a[href*='/nauthor/']", ".author"]
 
+const renaudBrayTitleSelectors = ["h1.lblTitle"]
+const renaudBrayAuthorSelectors = ["a.lnkItem[href*='Author=']"]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -75,6 +85,11 @@ const isBabelioPage = () =>
 const isNovelUpdatesPage = () =>
   window.location.hostname.endsWith(NOVELUPDATES_HOST) &&
   window.location.pathname.includes("/series/")
+
+const isRenaudBrayPage = () =>
+  window.location.hostname === RENAUD_BRAY_HOST &&
+  /^\/(livres_produit|books_product|livre_numerique_produit|ebook_product)\.aspx$/i.test(window.location.pathname) &&
+  /^[1-9]\d*$/.test(new URLSearchParams(window.location.search).get("id") ?? "")
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -108,7 +123,9 @@ const getBookTitle = (): HTMLElement | null => {
         ? babelioTitleSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesTitleSelectors
-          : null
+          : isRenaudBrayPage()
+            ? renaudBrayTitleSelectors
+            : null
 
   if (!selectors) return null
 
@@ -163,7 +180,9 @@ const getPrimaryAuthor = (): string => {
         ? babelioAuthorSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesAuthorSelectors
-          : null
+          : isRenaudBrayPage()
+            ? renaudBrayAuthorSelectors
+            : null
 
   if (!selectors) return ""
 
