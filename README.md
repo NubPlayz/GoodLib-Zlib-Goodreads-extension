@@ -11,6 +11,8 @@
 
 GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads and Hardcover book pages. No more copying titles and searching manually 
 
+Fnac France (`www.fnac.com`) print-book and e-book product pages are supported when the product's characteristics contain an ISBN. Both observed page layouts are handled, and author role labels are omitted from search queries. Non-book products without an ISBN are excluded.
+
 Learn more on [Offical site](https://goodlib.vercel.app)
 
 Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/detail/zlibrary-searcher/hacdelicpoafdkmkehadcdfkmkakiclf?hl=en) by [balldk](https://github.com/balldk)

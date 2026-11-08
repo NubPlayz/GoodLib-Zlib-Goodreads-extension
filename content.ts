@@ -9,7 +9,10 @@ export const config = {
     "https://beta.thestorygraph.com/*",
     "https://www.thestorygraph.com/*",
     "https://www.babelio.com/livres/*",
-    "https://www.novelupdates.com/series/*"
+    "https://www.novelupdates.com/series/*",
+    "https://www.fnac.com/a*",
+    "https://www.fnac.com/livre-numerique/a*",
+    "https://www.fnac.com/*/a*/w-4*"
   ]
 }
 
@@ -26,6 +29,7 @@ const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
+const FNAC_HOST = "www.fnac.com"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -64,6 +68,15 @@ const babelioAuthorSelectors = ["span[itemprop='author'] [itemprop='name']", "a[
 const novelUpdatesTitleSelectors = [".seriestitlenu", ".seriestitle", "div.seriestitlenu", ".series-title"]
 const novelUpdatesAuthorSelectors = ["a[id='authtag']", "#authtag", "a[href*='/nauthor/']", ".author"]
 
+const fnacTitleSelectors = [
+  "h1[data-automation-id='product-title-label']",
+  "h1[data-automation-id='pdp-productInformation-title']"
+]
+const fnacAuthorSelectors = [
+  ".f-productHeader-subTitle a[href*='/ia']",
+  "a[data-automation-id='pdp-productInformation-productTags-item-link'][href*='/ia']"
+]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -75,6 +88,27 @@ const isBabelioPage = () =>
 const isNovelUpdatesPage = () =>
   window.location.hostname.endsWith(NOVELUPDATES_HOST) &&
   window.location.pathname.includes("/series/")
+
+const isFnacPage = () => {
+  if (
+    window.location.hostname !== FNAC_HOST ||
+    !/^\/(?:(?:livre-numerique\/)?a[1-9]\d*(?:\/[^/]+)?|[^/]+\/a[1-9]\d*\/w-4)\/?$/.test(window.location.pathname)
+  ) {
+    return false
+  }
+
+  return Array.from(document.querySelectorAll(".f-productProperties__item, #features tr")).some(
+    (row) => {
+      const label = row.querySelector("dt, td:first-child")
+      const value = row.querySelector("dd, td:nth-child(2)")
+      const isbn = (value?.textContent ?? "").replace(/[\s-]/g, "")
+      return (
+        /^\s*ISBN\s*$/i.test(label?.textContent ?? "") &&
+        /^(?:97[89]\d{10}|\d{9}[\dX])$/i.test(isbn)
+      )
+    }
+  )
+}
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -108,7 +142,9 @@ const getBookTitle = (): HTMLElement | null => {
         ? babelioTitleSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesTitleSelectors
-          : null
+          : isFnacPage()
+            ? fnacTitleSelectors
+            : null
 
   if (!selectors) return null
 
@@ -153,6 +189,16 @@ const getPrimaryAuthor = (): string => {
         }
       }
     }
+  }
+
+  if (isFnacPage()) {
+    for (const node of document.querySelectorAll(fnacAuthorSelectors.join(", "))) {
+      const match = normalizeText(node.textContent ?? "").match(/^(.*?)\s*\(Auteur\)$/i)
+      if (match && match[1].trim()) {
+        return match[1].trim()
+      }
+    }
+    return ""
   }
 
   const selectors = isStoryGraphPage()
