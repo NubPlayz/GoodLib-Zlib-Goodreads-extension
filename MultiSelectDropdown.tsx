@@ -25,6 +25,7 @@ export function MultiSelectDropdown({
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchInputId = useId()
   const labelId = useId()
+  const summaryId = useId()
 
   const selectedSet = useMemo(() => new Set(selected), [selected])
 
@@ -123,9 +124,9 @@ export function MultiSelectDropdown({
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-labelledby={label ? labelId : undefined}
+        aria-labelledby={label ? `${labelId} ${summaryId}` : undefined}
       >
-        <span className="multiselect-trigger-text">{triggerSummary}</span>
+        <span id={summaryId} className="multiselect-trigger-text">{triggerSummary}</span>
         {selected.length > 0 && (
           <span className="multiselect-count-badge">{selected.length}</span>
         )}

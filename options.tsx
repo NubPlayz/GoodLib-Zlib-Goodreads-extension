@@ -188,6 +188,9 @@ function OptionsIndex() {
               value={selectedAnnaDomain}
               onChange={(e) => handleAnnaDomainChange(e.target.value)}
             >
+              {!annaDomains.includes(selectedAnnaDomain) && (
+                <option value={selectedAnnaDomain}>{selectedAnnaDomain}</option>
+              )}
               {annaDomains.map((d) => (
                 <option key={d} value={d}>
                   {d}
@@ -276,6 +279,9 @@ function OptionsIndex() {
               value={selectedDomain}
               onChange={(e) => handleDomainChange(e.target.value)}
             >
+              {!domains.includes(selectedDomain) && (
+                <option value={selectedDomain}>{selectedDomain}</option>
+              )}
               {domains.map((d) => (
                 <option key={d} value={d}>
                   {d}
@@ -360,6 +366,11 @@ function OptionsIndex() {
               value={selectedAudiobookbayDomain}
               onChange={(e) => handleAudiobookbayDomainChange(e.target.value)}
             >
+              {!audiobookbayDomains.includes(selectedAudiobookbayDomain) && (
+                <option value={selectedAudiobookbayDomain}>
+                  {formatDomainLabel(selectedAudiobookbayDomain)}
+                </option>
+              )}
               {audiobookbayDomains.map((domain) => (
                 <option key={domain} value={domain}>
                   {formatDomainLabel(domain)}
