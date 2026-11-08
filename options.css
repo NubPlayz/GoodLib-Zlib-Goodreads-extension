@@ -224,3 +224,21 @@ select:focus {
 .footer-feedback a {
   color: #777;
 }
+
+@media (max-width: 600px) {
+  .options-container {
+    padding: 24px 12px;
+  }
+
+  .options-card {
+    padding: 28px 16px;
+  }
+
+  .title-main {
+    font-size: 36px;
+  }
+
+  .advanced-filters-box {
+    padding: 12px 14px;
+  }
+}
