@@ -38,7 +38,8 @@
       "https://app.thestorygraph.com/*",
       "https://www.thestorygraph.com/*",
       "https://www.babelio.com/livres/*",
-      "https://www.novelupdates.com/series/*"
+      "https://www.novelupdates.com/series/*",
+      "https://www.indigo.ca/products/*"
     ],
     "browser_specific_settings": {
       "gecko": {
