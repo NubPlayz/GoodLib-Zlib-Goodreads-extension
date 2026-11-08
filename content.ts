@@ -9,7 +9,8 @@ export const config = {
     "https://beta.thestorygraph.com/*",
     "https://www.thestorygraph.com/*",
     "https://www.babelio.com/livres/*",
-    "https://www.novelupdates.com/series/*"
+    "https://www.novelupdates.com/series/*",
+    "https://www.indigo.ca/products/*"
   ]
 }
 
@@ -26,6 +27,7 @@ const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
+const INDIGO_HOST = "www.indigo.ca"
 const ZLIB_DOMAIN_KEY = "zlibDomain"
 const DEFAULT_DOMAIN = "z-lib.sk"
 const ANNA_DOMAIN_KEY = "annaDomain"
@@ -64,6 +66,9 @@ const babelioAuthorSelectors = ["span[itemprop='author'] [itemprop='name']", "a[
 const novelUpdatesTitleSelectors = [".seriestitlenu", ".seriestitle", "div.seriestitlenu", ".series-title"]
 const novelUpdatesAuthorSelectors = ["a[id='authtag']", "#authtag", "a[href*='/nauthor/']", ".author"]
 
+const indigoTitleSelectors = ["h1.product__title.js-product-title"]
+const indigoAuthorSelectors = ["a.product__contributor-name.js-contributor-link"]
+
 const isHardcoverPage = () => window.location.hostname === HARDCOVER_HOST
 const isGoodreadsPage = () => window.location.hostname.endsWith(GOODREADS_HOST)
 const isStoryGraphPage = () =>
@@ -75,6 +80,26 @@ const isBabelioPage = () =>
 const isNovelUpdatesPage = () =>
   window.location.hostname.endsWith(NOVELUPDATES_HOST) &&
   window.location.pathname.includes("/series/")
+
+const isIndigoPage = () => {
+  if (
+    window.location.hostname !== INDIGO_HOST ||
+    !/^\/products\/[^/]+\/?$/.test(window.location.pathname)
+  ) {
+    return false
+  }
+
+  return Array.from(document.querySelectorAll(".product-details__metafield")).some(
+    (field) => {
+      const rowText = field.closest("li")?.textContent ?? ""
+      const isbn = (field.textContent ?? "").replace(/[\s-]/g, "")
+      return (
+        /^\s*ISBN\s*:/i.test(rowText) &&
+        /^(?:97[89]\d{10}|\d{9}[\dX])$/i.test(isbn)
+      )
+    }
+  )
+}
 
 const getHardcoverTitle = (): HTMLElement | null => {
   for (const selector of hardcoverTitleSelectors) {
@@ -108,7 +133,9 @@ const getBookTitle = (): HTMLElement | null => {
         ? babelioTitleSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesTitleSelectors
-          : null
+          : isIndigoPage()
+            ? indigoTitleSelectors
+            : null
 
   if (!selectors) return null
 
@@ -163,7 +190,9 @@ const getPrimaryAuthor = (): string => {
         ? babelioAuthorSelectors
         : isNovelUpdatesPage()
           ? novelUpdatesAuthorSelectors
-          : null
+          : isIndigoPage()
+            ? indigoAuthorSelectors
+            : null
 
   if (!selectors) return ""
 
