@@ -3,18 +3,21 @@ import { useEffect, useState, type ChangeEvent } from "react"
 
 import "./popup.css"
 import mascotCat from "./mascot cat.png"
+import {
+  ANNA_DOMAIN_KEY,
+  AUDIOBOOKBAY_DOMAIN_KEY,
+  DEFAULT_ANNA_DOMAIN,
+  DEFAULT_AUDIOBOOKBAY_DOMAIN,
+  DEFAULT_ZLIB_DOMAIN,
+  ZLIB_DOMAIN_KEY
+} from "./search-filters"
 
 const ZLIB_ENABLED_KEY = "zlibEnabled"
 const ANNA_ENABLED_KEY = "annaEnabled"
 const AUDIOBOOKBAY_ENABLED_KEY = "audiobookbayEnabled"
 const GUTENBERG_ENABLED_KEY = "gutenbergEnabled"
 const OCEANOFPDF_ENABLED_KEY = "oceanofpdfEnabled"
-const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-library.gs"
-const ANNA_DOMAIN_KEY = "annaDomain"
-const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
-const AUDIOBOOKBAY_DOMAIN_KEY = "audiobookbayDomain"
-const DEFAULT_AUDIOBOOKBAY_DOMAIN = "https://audiobookbay.lu"
+const DEFAULT_DOMAIN = DEFAULT_ZLIB_DOMAIN
 
 type SourceKey = "zlib" | "anna" | "audiobookbay" | "gutenberg" | "oceanofpdf"
 
@@ -32,13 +35,16 @@ type SourceConfig = {
 type SourceState = Record<SourceKey, boolean>
 type SubtitleState = Record<SourceKey, string>
 
+const formatDomainSubtitle = (value: string) =>
+  value.replace(/^https?:\/\//, "").replace(/\/+$/, "")
+
 const sourceConfig: Record<SourceKey, SourceConfig> = {
   zlib: {
     avatarText: "Z",
     label: "Z-Lib",
     rowClassName: "anime-row-zlib",
     storageKey: ZLIB_ENABLED_KEY,
-    subtitle: "z-lib.gl",
+    subtitle: DEFAULT_ZLIB_DOMAIN,
     tagClassName: "anime-tag-zlib",
     trackClassName: "zlib-switch"
   },
@@ -48,7 +54,7 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     label: "Anna's",
     rowClassName: "anime-row-anna",
     storageKey: ANNA_ENABLED_KEY,
-    subtitle: "annas-archive.gd",
+    subtitle: DEFAULT_ANNA_DOMAIN,
     tagClassName: "anime-tag-anna",
     trackClassName: "anna-switch"
   },
@@ -58,7 +64,7 @@ const sourceConfig: Record<SourceKey, SourceConfig> = {
     label: "AudiobookBay",
     rowClassName: "anime-row-audiobookbay",
     storageKey: AUDIOBOOKBAY_ENABLED_KEY,
-    subtitle: "audiobookbay.lu",
+    subtitle: formatDomainSubtitle(DEFAULT_AUDIOBOOKBAY_DOMAIN),
     tagClassName: "anime-tag-audiobookbay",
     trackClassName: "audiobookbay-switch"
   },
@@ -97,13 +103,10 @@ const defaultSourceState: SourceState = {
 const defaultSubtitles: SubtitleState = {
   zlib: DEFAULT_DOMAIN,
   anna: DEFAULT_ANNA_DOMAIN,
-  audiobookbay: "audiobookbay.lu",
+  audiobookbay: formatDomainSubtitle(DEFAULT_AUDIOBOOKBAY_DOMAIN),
   gutenberg: sourceConfig.gutenberg.subtitle,
   oceanofpdf: sourceConfig.oceanofpdf.subtitle
 }
-
-const formatDomainSubtitle = (value: string) =>
-  value.replace(/^https?:\/\//, "").replace(/\/+$/, "")
 
 const runToggleAnimation = (source: SourceKey, isEnabled: boolean) => {
   animate(`.anime-row-${source}`, {

@@ -1,7 +1,23 @@
 import "./content.css"
+import {
+  ANNA_DOMAIN_KEY,
+  ANNA_FILTERS_KEY,
+  AUDIOBOOKBAY_DOMAIN_KEY,
+  DEFAULT_ANNA_DOMAIN,
+  DEFAULT_AUDIOBOOKBAY_DOMAIN,
+  DEFAULT_ZLIB_DOMAIN,
+  ZLIB_DOMAIN_KEY,
+  ZLIB_FILTERS_KEY,
+  buildAnnaSearchUrl,
+  buildZlibSearchUrl,
+  type AnnaPreferences,
+  type ZlibPreferences
+} from "./search-filters"
 
 export const config = {
   matches: [
+    "https://goodreads.com/book/*",
+    "https://goodreads.com/*/book/*",
     "https://www.goodreads.com/book/*",
     "https://www.goodreads.com/*/book/*",
     "https://hardcover.app/*",
@@ -26,12 +42,14 @@ const GOODREADS_HOST = "goodreads.com"
 const STORYGRAPH_HOST = "thestorygraph.com"
 const BABELIO_HOST = "babelio.com"
 const NOVELUPDATES_HOST = "novelupdates.com"
-const ZLIB_DOMAIN_KEY = "zlibDomain"
-const DEFAULT_DOMAIN = "z-lib.sk"
-const ANNA_DOMAIN_KEY = "annaDomain"
-const DEFAULT_ANNA_DOMAIN = "annas-archive.gd"
-const AUDIOBOOKBAY_DOMAIN_KEY = "audiobookbayDomain"
-const DEFAULT_AUDIOBOOKBAY_DOMAIN = "https://audiobookbay.lu"
+const DEFAULT_DOMAIN = DEFAULT_ZLIB_DOMAIN
+
+let currentZlibDomain = DEFAULT_DOMAIN
+let currentAnnaDomain = DEFAULT_ANNA_DOMAIN
+let currentAudiobookbayDomain = DEFAULT_AUDIOBOOKBAY_DOMAIN
+
+let annaFilters: AnnaPreferences = {}
+let zlibFilters: ZlibPreferences = {}
 
 const goodreadsTitleSelectors = [
   "h1[data-testid='bookTitle']",
@@ -202,10 +220,6 @@ const sourceMeta: Record<SourceKey, { label: string; glyph: string }> = {
   oceanofpdf: { label: "OceanofPDF", glyph: "OP" }
 }
 
-let currentZlibDomain = DEFAULT_DOMAIN
-let currentAnnaDomain = DEFAULT_ANNA_DOMAIN
-let currentAudiobookbayDomain = DEFAULT_AUDIOBOOKBAY_DOMAIN
-
 const normalizeAudiobookbayDomain = (value: string) => {
   const trimmed = value.trim().replace(/\/+$/, "")
   if (!trimmed) {
@@ -216,10 +230,13 @@ const normalizeAudiobookbayDomain = (value: string) => {
 }
 
 const buildSourceUrl = (source: SourceKey, query: string) => {
-  const encoded = encodeURIComponent(query)
   if (source === "anna") {
-    return `https://${currentAnnaDomain}/search?q=${encoded}`
+    return buildAnnaSearchUrl(query, annaFilters, currentAnnaDomain)
   }
+  if (source === "zlib") {
+    return buildZlibSearchUrl(query, zlibFilters, currentZlibDomain)
+  }
+  const encoded = encodeURIComponent(query)
   if (source === "audiobookbay") {
     const normalizedAudiobookQuery = String(query).toLowerCase()
     const url = new URL("/", normalizeAudiobookbayDomain(currentAudiobookbayDomain))
@@ -234,7 +251,7 @@ const buildSourceUrl = (source: SourceKey, query: string) => {
     return `https://oceanofpdf.com/?s=${encoded}`
   }
 
-  return `https://${currentZlibDomain}/s/${encoded}`
+  return buildZlibSearchUrl(query, zlibFilters, currentZlibDomain)
 }
 
 const makeChip = (source: SourceKey, searchQuery: string) => {
@@ -378,7 +395,9 @@ const initializeEnabledState = () => {
       OCEANOFPDF_ENABLED_KEY,
       ZLIB_DOMAIN_KEY,
       ANNA_DOMAIN_KEY,
-      AUDIOBOOKBAY_DOMAIN_KEY
+      AUDIOBOOKBAY_DOMAIN_KEY,
+      ANNA_FILTERS_KEY,
+      ZLIB_FILTERS_KEY
     ],
     (result) => {
       const zlibStored = result[ZLIB_ENABLED_KEY]
@@ -389,6 +408,8 @@ const initializeEnabledState = () => {
       const domainStored = result[ZLIB_DOMAIN_KEY]
       const annaDomainStored = result[ANNA_DOMAIN_KEY]
       const audiobookbayDomainStored = result[AUDIOBOOKBAY_DOMAIN_KEY]
+      const annaFiltersStored = result[ANNA_FILTERS_KEY]
+      const zlibFiltersStored = result[ZLIB_FILTERS_KEY]
 
       enabledBySource.zlib = typeof zlibStored === "boolean" ? zlibStored : true
       enabledBySource.anna = typeof annaStored === "boolean" ? annaStored : true
@@ -407,6 +428,12 @@ const initializeEnabledState = () => {
       }
       if (audiobookbayDomainStored) {
         currentAudiobookbayDomain = normalizeAudiobookbayDomain(audiobookbayDomainStored)
+      }
+      if (annaFiltersStored) {
+        annaFilters = annaFiltersStored
+      }
+      if (zlibFiltersStored) {
+        zlibFilters = zlibFiltersStored
       }
 
       syncChipToState()
@@ -467,6 +494,13 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       normalizeAudiobookbayDomain(
         changes[AUDIOBOOKBAY_DOMAIN_KEY].newValue || DEFAULT_AUDIOBOOKBAY_DOMAIN
       )
+  }
+
+  if (ANNA_FILTERS_KEY in changes) {
+    annaFilters = changes[ANNA_FILTERS_KEY].newValue || {}
+  }
+  if (ZLIB_FILTERS_KEY in changes) {
+    zlibFilters = changes[ZLIB_FILTERS_KEY].newValue || {}
   }
 
   if (ZLIB_ENABLED_KEY in changes) {
