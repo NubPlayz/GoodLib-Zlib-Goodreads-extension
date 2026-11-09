@@ -39,7 +39,7 @@ Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/deta
 - **No more copying titles and searching manually** 
 - **Toggleable sources** : enable or disable individual sources from the popup (e.g. only show Z-Lib and Anna's, hide Gutenberg)
 - **Animated UI** : powered by Anime.js v4
-- **Zero data collection** : the extension only activates on supported book pages, collects nothing, and stores only your source toggle preferences locally
+- **Zero data collection** : badges appear only on supported book pages; the extension collects nothing and stores your settings using browser extension storage
 - **Cross-browser** : works on Chrome (MV3) and Firefox (MV3)
 
 
@@ -126,10 +126,11 @@ Then load `build/chrome-mv3-dev` as an unpacked extension in Chrome, or the equi
 
 ## Privacy
 
-GoodLib requests host permissions only for supported book pages:
+GoodLib uses content scripts on configured Goodreads, Hardcover, StoryGraph, Babelio, Novel Updates, and Amazon URLs to detect books and add search badges.
 
-- `https://www.goodreads.com/book/*`
-- `https://hardcover.app/books/*`
+- Explicit `host_permissions` remain for Goodreads, Hardcover, StoryGraph, Babelio, and Novel Updates. These permissions apply to the listed hosts; Chrome ignores their path portions.
+- Amazon access uses the content-script matches for product URL patterns (`/dp/`, `/*/dp/`, `/gp/product/`, and `/*/gp/product/`) on the 23 storefronts listed above. No additional Amazon `host_permissions` are requested. Browsers may still request site access for these content scripts.
+- The Amazon content script can run on matching non-book product pages. It checks the page for book metadata before adding badges; non-book products receive no badges.
 
 - No user data is collected or transmitted
 - Source toggle preferences are stored locally via the `storage` permission
