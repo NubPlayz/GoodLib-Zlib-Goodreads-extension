@@ -11,7 +11,7 @@
 
 GoodLib is a free, open source browser extension that injects source badges directly onto Goodreads and Hardcover book pages. No more copying titles and searching manually 
 
-Indigo's English- and French-language print books and e-books are supported on `/products/` pages with a supported identifier in the ISBN-labelled Product Details row. This includes ISBN-10, ISBN-13 (`978`/`979`), and Indigo e-book identifiers beginning with `661` or `999`. Non-book products without a supported ISBN-labelled identifier are excluded.
+Indigo's English- and French-language print books and e-books are supported on `/products/` pages with a supported identifier in the ISBN-labelled Product Details row. This includes ISBN-10, ISBN-13 (`978`/`979`), and Indigo e-book identifiers beginning with `123`, `661`, or `999`. Non-book products without a supported ISBN-labelled identifier are excluded.
 
 Learn more on [Offical site](https://goodlib.vercel.app)
 

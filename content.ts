@@ -95,7 +95,7 @@ const isIndigoPage = () => {
       const isbn = (field.textContent ?? "").replace(/[\s-]/g, "")
       return (
         /^\s*ISBN\s*:/i.test(rowText) &&
-        /^(?:(?:97[89]|661|999)\d{10}|\d{9}[\dX])$/i.test(isbn)
+        /^(?:(?:97[89]|123|661|999)\d{10}|\d{9}[\dX])$/i.test(isbn)
       )
     }
   )
