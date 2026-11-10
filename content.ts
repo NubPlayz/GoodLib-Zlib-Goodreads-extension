@@ -10,7 +10,8 @@ export const config = {
     "https://www.thestorygraph.com/*",
     "https://www.babelio.com/livres/*",
     "https://www.novelupdates.com/series/*",
-    "https://www.barnesandnoble.com/w/*"
+    // Start before SPA navigation from the homepage or a category to a book.
+    "https://www.barnesandnoble.com/*"
   ]
 }
 

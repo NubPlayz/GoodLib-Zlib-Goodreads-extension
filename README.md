@@ -13,6 +13,8 @@ GoodLib is a free, open source browser extension that injects source badges dire
 
 Barnes & Noble (`www.barnesandnoble.com`) print-book, large-print, NOOK e-book, and audiobook product pages are supported on `/w/` routes when structured metadata identifies the current product as a book or audiobook. For editions without a book-type marker, a selected book format and a matching ISBN-style `ean`/product SKU are required. Non-book products such as toys are excluded even when they have contributor links.
 
+The content script starts on all Barnes & Noble pages so it can detect client-side navigation from the homepage or a category to a book without a reload. Badges still appear only on eligible book product pages.
+
 Learn more on [Offical site](https://goodlib.vercel.app)
 
 Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/detail/zlibrary-searcher/hacdelicpoafdkmkehadcdfkmkakiclf?hl=en) by [balldk](https://github.com/balldk)
@@ -32,7 +34,7 @@ Similar extension - [Z-libbrary-searcher](https://chromewebstore.google.com/deta
 - **No more copying titles and searching manually** 
 - **Toggleable sources** : enable or disable individual sources from the popup (e.g. only show Z-Lib and Anna's, hide Gutenberg)
 - **Animated UI** : powered by Anime.js v4
-- **Zero data collection** : the extension only activates on supported book pages, collects nothing, and stores only your source toggle preferences locally
+- **Zero data collection** : badges appear only on supported book pages; the extension collects nothing and stores your settings using browser extension storage
 - **Cross-browser** : works on Chrome (MV3) and Firefox (MV3)
 
 
