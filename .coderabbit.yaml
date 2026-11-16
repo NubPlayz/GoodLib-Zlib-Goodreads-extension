@@ -1,0 +1,5 @@
+reviews:
+  auto_review:
+    enabled: true
+    ignore_usernames:
+      - "dependabot[bot]"
