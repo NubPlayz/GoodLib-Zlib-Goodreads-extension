@@ -520,10 +520,13 @@ const handleDomChange = () => {
   }
 
   if (injectTimeout) {
+    // Let a pending B&N retry run even while page widgets keep updating.
+    if (window.location.hostname === BARNES_NOBLE_HOST) return
     clearTimeout(injectTimeout)
   }
 
   injectTimeout = setTimeout(() => {
+    injectTimeout = null
     if (lastUrl !== window.location.href) {
       lastUrl = window.location.href
       removeChip()
