@@ -5,25 +5,26 @@ body {
   padding: 0;
   background-color: #ffffff;
   color: #1a1a1a;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
 }
 
 .options-container {
   display: flex;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 60px 20px;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 .options-card {
   background-color: #fff4e5;
-  max-width: 700px;
+  max-width: 720px;
   width: 100%;
   padding: 50px 60px;
-  border-radius: 12px;
+  border-radius: 14px;
   box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
 .header-small {
@@ -46,51 +47,198 @@ body {
 .last-updated {
   font-size: 15px;
   color: #6a6a6a;
-  margin-bottom: 48px;
+  margin-bottom: 36px;
 }
 
-h2 {
+.settings-section {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.settings-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-header h2 {
   font-size: 22px;
-  font-weight: 500;
-  margin: 40px 0 16px 0;
+  font-weight: 600;
+  margin: 0;
   color: #000;
 }
 
+.reset-section-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #666666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reset-section-btn:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+  border-color: #1a1a1a;
+}
+
+.advanced-filters-box {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 20px;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.advanced-filters-box:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.advanced-filters-box--open {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.advanced-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.advanced-filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: left;
+}
+
+.advanced-filters-toggle:hover .advanced-filters-title {
+  color: #000000;
+  text-decoration: underline;
+}
+
+.advanced-filters-chevron {
+  font-size: 10px;
+  color: #777777;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  line-height: 1;
+}
+
+.advanced-filters-chevron--open {
+  transform: rotate(90deg);
+}
+
+.advanced-filters-content {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  animation: fadeInDown 0.15s ease-out;
+}
+
+
 .description {
-  font-size: 15px;
-  color: #444;
+  font-size: 14px;
+  color: #555555;
   margin-bottom: 20px;
 }
 
-.mirror-selection {
-  margin-top: 32px;
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 select {
   width: 100%;
-  padding: 12px 16px;
+  padding: 11px 14px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: white;
-  font-size: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  font-size: 14px;
   color: #1a1a1a;
   cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+select:hover {
+  border-color: rgba(0, 0, 0, 0.35);
 }
 
 select:focus {
-  outline: 2px solid #000;
-  outline-offset: 2px;
+  outline: none;
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
 .footer {
-  margin-top: 80px;
+  margin-top: 60px;
   font-size: 14px;
   color: #888;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding-top: 24px;
 }
 
 .footer a {
-  color: #666;
+  color: #444;
   text-decoration: underline;
+}
+
+.footer-feedback {
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.footer-feedback a {
+  color: #777;
+}
+
+@media (max-width: 600px) {
+  .options-container {
+    padding: 24px 12px;
+  }
+
+  .options-card {
+    padding: 28px 16px;
+  }
+
+  .title-main {
+    font-size: 36px;
+  }
+
+  .advanced-filters-box {
+    padding: 12px 14px;
+  }
 }
