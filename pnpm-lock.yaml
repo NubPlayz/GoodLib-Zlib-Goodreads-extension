@@ -2814,8 +2814,8 @@ packages:
   svg-parser@2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
 
-  svgo@2.8.2:
-    resolution: {integrity: sha512-TyzE4NVGLUFy+H/Uy4N6c3G0HEeprsVfge6Lmq+0FdQQ/zqoVYB62IsBZORsiL+o96s6ff/V6/3UQo/C0cgCAA==}
+  svgo@2.8.4:
+    resolution: {integrity: sha512-2GJ4h3rl13qYTdwllaK6QlL8tG+UrM8626V2Ylcd/yBUv2Y/EwLsYisVV6UDCRmlk+C74G8nMpxJCk0RWPdDCw==}
     engines: {node: '>=10.13.0'}
     hasBin: true
 
@@ -3704,10 +3704,10 @@ snapshots:
   '@parcel/optimizer-htmlnano@2.9.3(@parcel/core@2.9.3)(postcss@8.5.8)(typescript@5.8.2)':
     dependencies:
       '@parcel/plugin': 2.9.3(@parcel/core@2.9.3)
-      htmlnano: 2.1.5(postcss@8.5.8)(svgo@2.8.2)(typescript@5.8.2)
+      htmlnano: 2.1.5(postcss@8.5.8)(svgo@2.8.4)(typescript@5.8.2)
       nullthrows: 1.1.1
       posthtml: 0.16.7
-      svgo: 2.8.2
+      svgo: 2.8.4
     transitivePeerDependencies:
       - '@parcel/core'
       - cssnano
@@ -3732,7 +3732,7 @@ snapshots:
       '@parcel/diagnostic': 2.9.3
       '@parcel/plugin': 2.9.3(@parcel/core@2.9.3)
       '@parcel/utils': 2.9.3
-      svgo: 2.8.2
+      svgo: 2.8.4
     transitivePeerDependencies:
       - '@parcel/core'
 
@@ -4587,7 +4587,7 @@ snapshots:
       '@svgr/core': 6.5.1(supports-color@7.2.0)
       cosmiconfig: 7.1.0
       deepmerge: 4.3.1
-      svgo: 2.8.2
+      svgo: 2.8.4
 
   '@swc/core-darwin-arm64@1.15.18':
     optional: true
@@ -5247,14 +5247,14 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  htmlnano@2.1.5(postcss@8.5.8)(svgo@2.8.2)(typescript@5.8.2):
+  htmlnano@2.1.5(postcss@8.5.8)(svgo@2.8.4)(typescript@5.8.2):
     dependencies:
       '@types/relateurl': 0.2.33
       cosmiconfig: 9.0.1(typescript@5.8.2)
       posthtml: 0.16.7
     optionalDependencies:
       postcss: 8.5.8
-      svgo: 2.8.2
+      svgo: 2.8.4
     transitivePeerDependencies:
       - typescript
 
@@ -6035,7 +6035,7 @@ snapshots:
 
   svg-parser@2.0.4: {}
 
-  svgo@2.8.2:
+  svgo@2.8.4:
     dependencies:
       commander: 7.2.0
       css-select: 4.3.0
